@@ -18,6 +18,7 @@ Using a widely recognized open baseline allows peers and recruiters to easily re
 ## ⚡ 1. Data Extraction with Dynamo
 
 ### Dynamo Graph
+![Dynamo Graph for ModelParameters Data Set](images/ModelParameters_Dynamo.png)
 
 
 ## 🧼 2. Data Cleaning with Power Query
