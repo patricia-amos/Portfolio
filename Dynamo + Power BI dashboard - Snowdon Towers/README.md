@@ -26,10 +26,9 @@ The first one is the ModelParameters.csv. This dynamo script extracts the parame
 
 The graph started with a python script that searches the Revit document and returns model elements that have actual 3D solid geometry, while excluding things such as element types, annotations, views, sheets, rooms, spaces, areas, and other non-solid/model data. 
 
+[View full Python script](dynamo/ElementCollector.py)
+
 Initially, I wanted to use nodes for this but I was limited with options because the existing nodes that were in dynamo required me to specify per category to be able to extract its corresponding elements which would be inefficient since I wanted to extract ALL placed model elements and not just elements from specific categories. Using a python script was the best option for this case as it can collect all model elements without the need to specify. 
-
-
-
 
 ## 🧼 2. Data Cleaning with Power Query
 
