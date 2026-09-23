@@ -28,7 +28,76 @@ The graph started with a python script that searches the Revit document and retu
 
 [View full Python script](dynamo/ElementCollector.py)
 
-Initially, I wanted to use nodes for this but I was limited with options because the existing nodes that were in dynamo required me to specify per category to be able to extract its corresponding elements which would be inefficient since I wanted to extract ALL placed model elements and not just elements from specific categories. Using a python script was the best option for this case as it can collect all model elements without the need to specify. 
+Initially, I wanted to use nodes for this but I was limited with options because the existing nodes that were in dynamo required me to specify per category to be able to extract its corresponding elements which would be inefficient since I wanted to extract ALL placed model elements and not just elements from specific categories. Using a python script was the best option for this case as it can collect all model elements without the need to specify. I also added a code as highlighted below to make sure that all elements collected are 3D physical elements and to filter out all collected non physical elements such as bypassing 2D/3D model lines and spatial elements (Rooms, Spaces, Areas) by drilling down into complete geometryinstance architectures and validating true 3D surfaces. 
+
+```diff
+import clr
+clr.AddReference('RevitAPI')
+from Autodesk.Revit.DB import *
+
+clr.AddReference('RevitServices')
+import RevitServices
+from RevitServices.Persistence import DocumentManager
+
+doc = DocumentManager.Instance.CurrentDBDocument
+
+# 1. Grab all element instances globally across the database background
+collector = FilteredElementCollector(doc).WhereElementIsNotElementType()
+
+physical_elements = []
+
+geo_options = Options()
+geo_options.DetailLevel = ViewDetailLevel.Coarse
+
+# 2. Fully dynamic evaluation loop with exception handling
+for elem in collector:
+    if elem is None:
+        continue
+        
+    cat = elem.Category
+    if cat is None:
+        continue # Drops non-graphical internal data maps
+        
++   # Filter out non-3D objects early to save memory and processing time
++   if cat.CategoryType != CategoryType.Model:
++       continue # Excludes annotations, schedules, views, and sheets
+        
++   if isinstance(elem, SpatialElement):
++       continue # Skip Spatial Elements (Rooms/Spaces/Areas) completely 
+
+    # 3. DEFENSIVE CHECK: Ensure the object actually supports geometry properties 
+    if not hasattr(elem, "get_Geometry"):
+        continue
+
+    # 4. Geometry Check (Separates true physical volumes from lines/curves)
+    geo_elem = elem.get_Geometry(geo_options)
+    if geo_elem is None:
+        continue
+        
+    has_solid = False
+    for geo_obj in geo_elem:
++       # Check direct geometry for 3D faces
+        if isinstance(geo_obj, Solid) and geo_obj.Faces.Size > 0:
+            has_solid = True
+            break
++       # Dig into Family Instances (Doors, Windows, Furniture) to extract nested solids
+        elif isinstance(geo_obj, GeometryInstance):
+            instance_geo = geo_obj.GetInstanceGeometry()
+            for sub_obj in instance_geo:
+                if isinstance(sub_obj, Solid) and sub_obj.Faces.Size > 0:
+                    has_solid = True
+                    break
+                    
+    # 5. Keep only true physical volumes
+    if has_solid:
+        physical_elements.append(elem)
+
+# Output clean instances directly to visual nodes
+OUT = physical_elements
+```
+
+
+
 
 ## 🧼 2. Data Cleaning with Power Query
 
