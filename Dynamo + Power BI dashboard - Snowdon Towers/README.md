@@ -22,7 +22,7 @@ There are 3 data sets that were extracted from the Revit file through dynamo.
 The first one is the ModelParameters.csv. This dynamo script extracts the parameters namely element ID, type, name, category, level, area, volume, length, mark, comments, phase created, and workset from the model with initial data cleaning, list arrangements, and  data export into a csv file. 
 
 ### Dynamo Graph
-![Dynamo Graph for ModelParameters Data Set](images/ModelParameters_Dynamo.png)
+![Dynamo Graph for ModelParameters Data Set](images/ModelParametersDynamo.png)
 
 The graph started with a python script that searches the Revit document and returns model elements that have actual 3D solid geometry, while excluding things such as element types, annotations, views, sheets, rooms, spaces, areas, and other non-solid/model data. 
 
@@ -95,6 +95,16 @@ for elem in collector:
 # Output clean instances directly to visual nodes
 OUT = physical_elements
 ```
+
+Next part of the script is extracting element parameter values for element type, ID, name, category, level, area, volume, length, mark, comments, phase created, and workset. These were collected through the nodes *Element.Id, Element.ElementType, ELement.Name, ELement.GetCategory, amd Parameter.ParameterByName*. 
+
+It's important to take note that there were commas observed on element names so it was removed through the node *String.Replace* which is found after *Element.Name*. Since the output is a csv (comma separated value) file, removing the commas would ensure that the values extracted for element name would be recognized as one value and no more than that. 
+
+After the parameter values were collected these were placed on a list through the node List Create and transposed through *List.Transpose* so that every parameter type would have their own column and on each row would be the parameter values for each element. A manual code block for the column names were also created through *List Create* and added on the first row through *List.AddItemToFront*. 
+
+This list would then be exported through *Data.ExportCSV* and the file path is specified through the node *File Location*. 
+
+
 
 
 
