@@ -19,10 +19,10 @@ Using a widely recognized open baseline allows peers and recruiters to easily re
 
 There are 3 data sets that were extracted from the Revit file through dynamo. 
 
-The first one is the ModelParameters.csv. This dynamo script extracts the parameters namely element ID, type, name, category, level, area, volume, length, mark, comments, phase created, and workset from the model with initial data cleaning, list arrangements, and  data export into a csv file. 
-
-### Dynamo Graph
+### ModelParameters Dynamo Graph
 ![Dynamo Graph for ModelParameters Data Set](images/ModelParametersDynamo.png)
+
+The first one is the ModelParameters.csv. This dynamo script extracts the parameters namely element ID, type, name, category, level, area, volume, length, mark, comments, phase created, and workset from the model with initial data cleaning, list arrangements, and  data export into a csv file. 
 
 The graph started with a python script that searches the Revit document and returns model elements that have actual 3D solid geometry, while excluding things such as element types, annotations, views, sheets, rooms, spaces, areas, and other non-solid/model data. 
 
@@ -102,8 +102,10 @@ It's important to take note that there were commas observed on element names so 
 
 After the parameter values were collected these were placed on a list through the node List Create and transposed through *List.Transpose* so that every parameter type would have their own column and on each row would be the parameter values for each element. A manual code block for the column names were also created through *List Create* and added on the first row through *List.AddItemToFront*. 
 
-This list would then be exported through *Data.ExportCSV* and the file path is specified through the node *File Location*. 
+This list would then be exported through *Data.ExportCSV* and the file path is specified through the node *File Location*. Final output for this section would be a ModelParameters.csv file. 
 
+### ProjectInfo&Warnings Dynamo Graph
+![Dynamo Graph for ProjectInfo and Warnings Data Set](images/ProjectInfo&WarningsDynamo.png)
 
 
 
