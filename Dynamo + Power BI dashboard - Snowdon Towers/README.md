@@ -107,7 +107,11 @@ This list would then be exported through *Data.ExportCSV* and the file path is s
 ### ProjectInfo&Warnings Dynamo Graph
 ![Dynamo Graph for ProjectInfo and Warnings Data Set](images/ProjectInfo&WarningsDynamo.png)
 
+These two data sets are combined with this dynamo. The ProjectInfo.csv file contains the file size and the number of links inside the revit file while the Warnings.csv file contains revit warnings and their corresponding element ID. 
 
+Starting with the project info, the dynamo script for this is simple. To get the number of links, I started with the *Document.Current* node to get the active project document then *Document.GetlinkInstances* to retrieve revit link instances in the present document and *List.Count* to count the number of links given by *Document.GetlinkInstances* that would give us a number output. To get the file size, I also started with *Document.Current* to get the active project document but for this one we'll be using this node to be able to retrieve the actual file on my local throug *Document.FilePath* and *File from path*. This is connected to the *FileSystem.FileSize* node to be able to get the file size in mb. The file size and number of links will be then arranged into a list and exported as csv as ProjectInfo.csv. 
+
+For the warnings file, 
 
 
 
