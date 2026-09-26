@@ -108,14 +108,17 @@ After the parameter values were collected these were placed on a list through th
 This list would then be exported through *Data.ExportCSV* and the file path is specified through the node *File Location*. Final output for this section would be a ModelParameters.csv file. 
 
 ### ProjectInfo&Warnings Dynamo Graph
-![Dynamo Graph for ProjectInfo and Warnings Data Set](images/ProjectInfo&WarningsDynamo.png)
+
 
 [View ProjectInfo&Warnings dynamo script](dynamo/ProjectInfo&Warnings.dyn)
 
-These two data sets are combined with this dynamo. The ProjectInfo.csv file contains the file size and the number of links inside the revit file while the Warnings.csv file contains revit warnings and their corresponding element ID. 
+These two data sets are combined in ProjectInfo&Warnings.dyn. The ProjectInfo.csv file contains the file size and the number of links inside the revit file while the Warnings.csv file contains revit warnings and their corresponding element ID. 
+
+![Dynamo Graph for ProjectInfo Data Set](images/ProjectInfoDynamo.png)
 
 Starting with the project info, the dynamo script for this is simple. To get the number of links, I started with the *Document.Current* node to get the active project document then *Document.GetlinkInstances* to retrieve revit link instances in the present document and *List.Count* to count the number of links given by *Document.GetlinkInstances* that would give us a number output. To get the file size, I also started with *Document.Current* to get the active project document but for this one I used this node to be able to retrieve the actual file on my local through *Document.FilePath* and *File from path*. This is connected to the *FileSystem.FileSize* node to be able to get the file size in mb. The file size and number of links will be then arranged into a list and exported as csv as ProjectInfo.csv. 
 
+![Dynamo Graph for Warnings Data Set](images/WarningsDynamo.png)
 For the warnings file, nodes *Warning.GetWarnings*, *Warning.Description*, and *Warning.GetFailingElements* were used to get the warning descriptions and the corresponding elements that were affected by the warnings. I got the elements IDs through *Element.Id*. I observed that there are warning descriptions that would affect one or more elements. The numbers of items on the element ids list and the warning descriptions wouldn't match because the corresponding elements were grouped together based on their description. To fix this, I generated a new list for the warning description through using the nodes *List.Flatten*, *List.OfRepeatedItem*, and *List.Count*. This new list would duplicate the warning descriptions for those affected element ids resulting to the same number of items for the element ids list. I used a code block to enclose the description with double paretheses to ensure that the csv file would read per description as one input since the output file would be a csv file and commas can be possibly read as a separator. After this, the warnings descriptions and element ids would be arranged in a list and exported as Warnings.csv. 
 
 ## 🧼 2. Data Cleaning with Power Query
