@@ -124,12 +124,35 @@ For the warnings file, nodes *Warning.GetWarnings*, *Warning.Description*, and *
 ## 🧼 2. Data Cleaning with Power Query
 
 ### Before Cleaning
+![OldModelParametersData](images/OldModelParametersData.png)
+
+*check power bi steps for blanks and empty cells
 
 ### After Cleaning
+![NewModelParametersData_1](images/NewModelParametersData_1.png)
+![NewModelParametersData_2](images/NewModelParametersData_2.png)
+
+For data cleaning of ModelsParameter data set, there are series of steps that were applied on power query. 
+![AppliedStepsPowerBI_ModelExport](images/AppliedStepsPowerBI_ModelExport.png)
+
+1. First row is promoted as headers. This is to officially recognize that the first row is the column names.
+2. All column value types are specified so that Power query can summarize their date appropriately.
+3. It was observed that for Phase Created, Comments, Mark, Lenth, Volume, Area, and Level, the values per row also contains the column name ie. "Level : Level 2". So for these columns we just find the column names and replace them with a blank to be able to remove them.
+4. Last were trimming of the trailing and leading spaces. 
+
+
+![AppliedStepsPowerBI_Warnings](images/AppliedStepsPowerBI_Warnings.png)
+For the Warning Data Set, a new column "Severity" was added. This will help bring focus to warning descriptions that are more critical than the rest. This is done through classifying the types of warnings that the model will have from High, Medium, and Low. The basis of the classification are keywords. For High Severity, keywords such as ......, for Medium Severity, keywords such as, and for Low Severity, those that are not classified to high and medium. Formula as shown below....
+
+Paste formula here 
+```diff
+Formula
+```
+
 
 ## 📊 3. Power BI Dashboard
 
 ### Dashboard Design
 
-## 🚀 4. How to Reproduce the Project
+
 
