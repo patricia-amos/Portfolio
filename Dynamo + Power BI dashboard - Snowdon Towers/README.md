@@ -8,7 +8,7 @@ Using a widely recognized open baseline allows peers and recruiters to easily re
 ## 🛠️ Tools & Technologies
 
 - **Autodesk Revit 2025** — BIM model and source data
-- **Dynamo v.3.3.0  ** — Automated Revit data extraction
+- **Dynamo v.3.3.0** — Automated Revit data extraction
 - **Power Query** — Data cleaning and transformation
 - **Power BI** — Data modeling and dashboard visualization
 - **DAX** — Calculations and KPI measures
@@ -21,6 +21,9 @@ There are 3 data sets that were extracted from the Revit file through dynamo.
 
 ### ModelParameters Dynamo Graph
 ![Dynamo Graph for ModelParameters Data Set](images/ModelParametersDynamo.png)
+
+[View ModelParameters dynamo script](dynamo/ModelParameters.dyn)
+
 
 The first one is the ModelParameters.csv. This dynamo script extracts the parameters namely element ID, type, name, category, level, area, volume, length, mark, comments, phase created, and workset from the model with initial data cleaning, list arrangements, and  data export into a csv file. 
 
@@ -106,6 +109,8 @@ This list would then be exported through *Data.ExportCSV* and the file path is s
 
 ### ProjectInfo&Warnings Dynamo Graph
 ![Dynamo Graph for ProjectInfo and Warnings Data Set](images/ProjectInfo&WarningsDynamo.png)
+
+[View ProjectInfo&Warnings dynamo script](dynamo/ProjectInfo&Warnings.dyn)
 
 These two data sets are combined with this dynamo. The ProjectInfo.csv file contains the file size and the number of links inside the revit file while the Warnings.csv file contains revit warnings and their corresponding element ID. 
 
