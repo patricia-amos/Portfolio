@@ -432,49 +432,31 @@ This page allows users to investigate model warnings without having to open the 
 
 ### 🔗 End-to-End Workflow
 The complete pipeline can be summarized as:
-┌──────────────────┐
-│   REVIT MODEL    │
-│  BIM Source Data │
-└────────┬─────────┘
-         │
-         ▼
-┌──────────────────┐
-│      DYNAMO      │
-│ Data Extraction  │
-│ + Python / API   │
-└────────┬─────────┘
-         │
-         ▼
-┌──────────────────┐
-│   CSV DATASETS   │
-│                  │
-│ Model Parameters │
-│ Project Info     │
-│ Warnings         │
-└────────┬─────────┘
-         │
-         ▼
-┌──────────────────┐
-│   POWER QUERY    │
-│ Clean & Transform│
-│ + Classification │
-└────────┬─────────┘
-         │
-         ▼
-┌──────────────────┐
-│     POWER BI     │
-│ Data Model +     │
-│ Visualization    │
-└────────┬─────────┘
-         │
-         ▼
-┌──────────────────┐
-│  BIM ANALYTICS   │
-│                  │
-│ Model Insights   │
-│ Asset Metadata   │
-│ Compliance/Risk  │
-└──────────────────┘
+```mermaid
+flowchart TD
+    A["🏢 Revit Model"] --> B["⚡ Dynamo"]
+
+    B --> B1["Python / Revit API"]
+    B --> C["📄 CSV Datasets"]
+
+    C --> C1["ModelParameters.csv"]
+    C --> C2["ProjectInfo.csv"]
+    C --> C3["Warnings.csv"]
+
+    C --> D["🧼 Power Query"]
+
+    D --> D1["Data Type Specification"]
+    D --> D2["Value Cleaning"]
+    D --> D3["Text Transformation"]
+    D --> D4["Warning Classification"]
+
+    D --> E["📊 Power BI"]
+
+    E --> E1["Executive Model Insights"]
+    E --> E2["Asset Metadata Matrix"]
+    E --> E3["Model Compliance & Risk Tracker"]
+
+    E --> F["🎯 BIM Data Analytics"]
 
 ### 🎯 Project Outcome
 The completed workflow demonstrates an end-to-end approach to transforming BIM information into structured, interactive analytics.
