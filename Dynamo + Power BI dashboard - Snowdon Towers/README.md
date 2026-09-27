@@ -406,7 +406,7 @@ The table can also be sorted based on individual parameter values. The row count
 This page can be used to review the completeness and consistency of element metadata. Blank or incomplete parameter values can be identified through the filters and matrix. Once an affected Element ID has been identified, the corresponding element can be located in Revit for further investigation or correction. The extracted dataset can therefore serve as a supporting reference for model quality review and parameter completeness checks.
 
 ### C. Model Compliance & Risk Tracker 
-![Dashboard Page for Asset Data Matrix](images/Dashboard_ModelCompliance&RiskTrackerDemo.gif)
+![Dashboard Page for ModelCompliance&RiskTracker](images/ModelCompliance&RiskTrackerDemo.gif) 
 The Model Compliance & Risk Tracker provides an interactive view of Revit warnings and their associated elements.
 
 The page combines:
