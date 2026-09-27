@@ -1,36 +1,96 @@
 # Revit BIM Data Automation & Analytics Pipeline 
+An end-to-end BIM data workflow that extracts information from a Revit model using Dynamo, cleans and transforms the resulting datasets with Power Query, and presents model information, asset metadata, and compliance indicators through Power BI.
+
+The project demonstrates how BIM data can be transformed from raw model information into structured datasets and interactive analytics for model review and stakeholder decision-making.
 
 ## 🏢 Dataset & Project Baseline
-To ensure complete compliance with data privacy laws and intellectual property rights, this pipeline was developed and stress-tested using **Autodesk's Industry-Standard Revit Sample Architecture Project** (*Snowdon Towers Sample Architectural.rvt*). 
 
-Using a widely recognized open baseline allows peers and recruiters to easily reproduce the entire pipeline locally.
+### Project Overview
+This project demonstrates a reproducible workflow for extracting, transforming, and analyzing BIM data from an Autodesk Revit model.
+
+The pipeline focuses on three areas:  
+BIM data extraction — extracting model elements, project information, and Revit warnings through Dynamo.  
+Data preparation — cleaning and transforming the extracted datasets using Power Query.  
+BIM analytics and visualization — presenting model metadata, element information, and compliance indicators through Power BI.  
+
+### Revit Model
+To protect project confidentiality and intellectual property, this pipeline was developed and tested using Autodesk's Revit sample architecture project, Snowdon Towers Sample Architectural.rvt.
+
+Using a standardized sample model provides a reproducible baseline that allows peers to understand and locally recreate the workflow without relying on proprietary project data. Using a widely recognized open baseline allows peers to easily reproduce the entire pipeline locally.
+
+### Project Objectives
+The primary objectives of the project are to:
+
+1. Automate the extraction of BIM information from a Revit model.
+2. Generate structured datasets that can be consumed by external data tools.
+3. Clean and transform BIM datasets for analytical use.
+4. Identify and classify model warnings using a rule-based approach.
+5. Develop interactive Power BI dashboards for model exploration and compliance review.
+6. Demonstrate an end-to-end workflow connecting BIM authoring, data automation, data preparation, and analytics.
 
 ## 🛠️ Tools & Technologies
 
 - **Autodesk Revit 2025** — BIM model and source data
 - **Dynamo v.3.3.0** — Automated Revit data extraction
+- **Python** — Revit API-based element collection and geometry filtering
 - **Power Query** — Data cleaning and transformation
-- **Power BI 2025** — Data modeling and dashboard visualization
+- **Power BI 2025** — Data modeling, analysis, and dashboard visualization
+- **Speckle** — Interactive 3D model visualization within the dashboard
 - **GitHub** — Project documentation and version control
 
 
 ## ⚡ 1. Data Extraction with Dynamo
 
-There are 3 data sets that were extracted from the Revit file through dynamo. 
+Three primary datasets were extracted from the Revit model using Dynamo:
+
+1. `ModelParameters.csv`
+2. `ProjectInfo.csv`
+3. `Warnings.csv`
+
+The Dynamo workflows combine native Dynamo nodes with Python-based Revit API logic where more advanced element filtering was required.
 
 ### A. ModelParameters Dynamo Graph
 ![Dynamo Graph for ModelParameters Data Set](images/ModelParametersDynamo.png)
 
-[View ModelParameters dynamo script](dynamo/ModelParameters.dyn)
+[View ModelParameters dynamo script](dynamo/ModelParameters.dyn)  
 
+The `ModelParameters.csv` dataset contains element-level information including:
 
-The first one is the ModelParameters.csv. This dynamo script extracts the parameters namely element ID, type, name, category, level, area, volume, length, mark, comments, phase created, and workset from the model with initial data cleaning, list arrangements, and  data export into a csv file. 
+- Element ID
+- Element Type
+- Name
+- Category
+- Level
+- Area
+- Volume
+- Length
+- Mark
+- Comments
+- Phase Created
+- Workset
 
-The graph started with a python script that searches the Revit document and returns model elements that have actual 3D solid geometry, while excluding things such as element types, annotations, views, sheets, rooms, spaces, areas, and other non-solid/model data. 
+The Dynamo workflow performs initial data preparation before exporting the resulting dataset to CSV.
+
+### Element Collection and Geometry Filtering
+
+The workflow begins with a Python script that searches the active Revit document and collects model elements that contain actual 3D solid geometry.
 
 [View full Python script](dynamo/ElementCollector.py)
 
-Initially, I wanted to use nodes for this but I was limited with options because the existing nodes that were in dynamo required me to specify per category to be able to extract its corresponding elements which would be inefficient since I wanted to extract ALL placed model elements and not just elements from specific categories. Using a python script was the best option for this case as it can collect all model elements without the need to specify. I also added a code as highlighted below to make sure that all elements collected are 3D physical elements and to filter out all collected non physical elements such as bypassing 2D/3D model lines and spatial elements (Rooms, Spaces, Areas) by drilling down into complete geometryinstance architectures and validating true 3D surfaces. 
+The initial approach considered was using Dynamo nodes alone. However, many of the available element-collection nodes require categories to be specified individually. This would make the workflow less efficient when the objective is to collect **all placed physical model elements** across the project.
+
+A Python-based Revit API approach provided a more dynamic solution.
+
+The script:
+- Collects non-type element instances from the Revit document.
+- Filters the collection to model categories.
+- Excludes spatial elements such as Rooms, Spaces, and Areas.
+- Checks whether an element supports geometry extraction.
+- Evaluates its geometry for valid 3D solids.
+- Examines nested `GeometryInstance` objects to identify solids within family instances.
+- Retains elements containing valid 3D geometry.
+
+The relevant portion of the script is shown below:
 
 ```diff
 import clr
@@ -97,31 +157,73 @@ for elem in collector:
 # Output clean instances directly to visual nodes
 OUT = physical_elements
 ```
+### Parameter Extraction
+After the physical model elements were identified, parameter values were extracted using Dynamo nodes including:
 
-Next part of the script is extracting element parameter values for element type, ID, name, category, level, area, volume, length, mark, comments, phase created, and workset. These were collected through the nodes *Element.Id, Element.ElementType, ELement.Name, ELement.GetCategory, and Parameter.ParameterByName*. 
+- `Element.Id`
+- `Element.ElementType`
+- `Element.Name`
+- `Element.GetCategory`
+- `Parameter.ParameterByName`
 
-It's important to take note that there were commas observed on element names so it was removed through the node *String.Replace*. Since the output is a csv (comma separated value) file, removing the commas would ensure that the values extracted for element name would be recognized as one value and no more than that. 
+The resulting values were organized using `List.Create` and `List.Transpose` so that each parameter became a separate column and each element occupied a corresponding row.
 
-After the parameter values were collected these were placed on a list through the node *List Create* and transposed through *List.Transpose* so that every parameter type would have their own column and on each row would be the parameter values for each element. Column names were also added through *List Create* and placed on the first row through *List.AddItemToFront*. 
+Column headers were added using `List.Create` and `List.AddItemToFront`.
 
-This list would then be exported through *Data.ExportCSV* and the file path is specified through the node *File Location*. Final output for this section would be a ModelParameters.csv file. 
+The completed dataset was then exported using `Data.ExportCSV`, with the output path controlled through the `File Location` node.
 
-### B. ProjectInfo&Warnings Dynamo Graph
+The resulting file is:
 
+`ModelParameters.csv`
+
+### Handling Commas in Text Values
+Commas were observed in some element names. Because the dataset was being exported as CSV, these characters could interfere with how the exported text was interpreted depending on the CSV-writing behavior.
+
+To prevent element names from being split into unintended fields in the resulting dataset, `String.Replace` was used to remove commas from the relevant text values before export.
+
+### B. Project Info & Warnings Dynamo Graph
+![Dynamo Graph for ProjectInfo Data Set](images/ProjectInfoDynamo.png)
+
+Two additional datasets were generated through `ProjectInfo&Warnings.dyn`:
+- `ProjectInfo.csv`
+- `Warnings.csv`  
 
 [View ProjectInfo&Warnings dynamo script](dynamo/ProjectInfo&Warnings.dyn)
 
-Two data sets were combined in ProjectInfo&Warnings.dyn. The ProjectInfo.csv file contains the file size and the number of links inside the revit file while the Warnings.csv file contains revit warnings and their corresponding element ID. 
+### Project Information
+The `ProjectInfo.csv` dataset contains:
+- Revit file size
+- Number of Revit link instances
 
-![Dynamo Graph for ProjectInfo Data Set](images/ProjectInfoDynamo.png)
+The number of links was obtained using:
+`Document.Current → Document.GetLinkInstances → List.Count`
 
-Starting with the project info, the dynamo script for this is simple. To get the number of links, I started with the *Document.Current* node to get the active project document then *Document.GetlinkInstances* to retrieve revit link instances in the present document and *List.Count* to count the number of links given by *Document.GetlinkInstances* that would give us a number output. To get the file size, I also started with *Document.Current* to get the active project document. But for this one I used this node to be able to retrieve the actual file on my local through *Document.FilePath* and *File from path*. This is connected to the *FileSystem.FileSize* node to be able to get the file size in mb. The file size and number of links would then be arranged into a list and exported as csv as ProjectInfo.csv. 
+For the file size, the workflow uses:
+`Document.Current → Document.FilePath → File from Path → FileSystem.FileSize`
 
+The resulting values were organized into a list and exported as `ProjectInfo.csv`.
+
+### Revit Warnings
 ![Dynamo Graph for Warnings Data Set](images/WarningsDynamo.png)
-For the warnings file, nodes *Warning.GetWarnings*, *Warning.Description*, and *Warning.GetFailingElements* were used to get the warning descriptions and the corresponding elements that were affected by the warnings. I got the elements IDs through *Element.Id*. I observed that there were warning descriptions that would affect one or more elements. The numbers of items on the element id list and the warning descriptions wouldn't match because the corresponding elements were grouped together based on their description. To fix this, I generated a new list for the warning descriptions through using the nodes *List.Flatten*, *List.OfRepeatedItem*, and *List.Count*. This new list would duplicate the warning descriptions for those affected element ids resulting to the same number of items for the element id list. I used a code block to enclose the description with double paretheses to ensure that the csv file would read per description as one input since the output file would be a csv file and commas could be possibly read as a separator. After this, the warnings descriptions and element ids would be arranged in a list and exported as Warnings.csv. 
+The `Warnings.csv` dataset contains Revit warning descriptions and the corresponding element IDs affected by each warning.
+
+The workflow uses:
+- `Warning.GetWarnings`
+- `Warning.Description`
+- `Warning.GetFailingElements`
+- `Element.Id`
+
+A challenge occurred because a single warning description can affect multiple elements. Consequently, the number of warning descriptions did not initially match the number of affected element IDs.
+
+To align the datasets, List.Flatten, List.OfRepeatedItem, and List.Count were used to repeat each warning description according to the number of affected elements.
+
+The warning description was also formatted before export to prevent commas within descriptions from being interpreted as unintended CSV separators.
+
+The resulting dataset was exported as:
+`Warnings.csv`
 
 ## 🧼 2. Data Cleaning and Transformation with Power Query
-
+The three extracted datasets were imported into Power Query for data cleaning, type specification, transformation, and preparation for Power BI analysis.
 
 ### A. ModelsParameter Data 
 
@@ -132,14 +234,16 @@ For the warnings file, nodes *Warning.GetWarnings*, *Warning.Description*, and *
 ![NewModelParametersData_1](images/NewModelParametersData_1.png)
 ![NewModelParametersData_2](images/NewModelParametersData_2.png)
 
-**Applied steps on Power Query**  
+**Applied steps**  
 ![AppliedStepsPowerBI_ModelExport](images/AppliedStepsPowerBI_ModelExport.png)
 
-For data cleaning of ModelsParameter data set, there were series of steps that were applied on power query. 
-1. First row was promoted as headers. This was to recognize that the first row was the column names.
-2. All column value types were specified so that Power query can summarize their data appropriately.
-3. It was observed that for Phase Created, Comments, Mark, Length, Volume, Area, and Level, the values per row also contains the column name ie. "Level : Level 2". So for these columns I applied find and replace, find the column names and replace them with a blank to be able to remove them.
-4. Last were trimming of the trailing and leading spaces. 
+The following transformations were applied:
+1. Promoted the first row to headers to correctly identify the dataset's column names.
+2. Specified appropriate data types for each column so that Power Query and Power BI could correctly interpret and analyze the values.
+3. Removed the parameter-name prefixes from fields including Phase Created, Comments, Mark, Length, Volume, Area, and Level.
+4. Trimmed leading and trailing whitespace from text values.
+
+The resulting table provides a cleaner structure for subsequent data modeling and visualization in Power BI.
 
 ### B. ProjectInfo Data 
 
@@ -149,12 +253,14 @@ For data cleaning of ModelsParameter data set, there were series of steps that w
 **After Cleaning and Transformation**  
 ![NewWProjectInfoData](images/NewProjectInfoData.png)
 
-**Applied steps on Power Query**  
+**Applied steps**  
 ![AppliedStepsPowerBI_ProjectInfo](images/AppliedStepsPowerBI_ProjectInfo.png)  
 
-For data cleaning of ProjectInfo data set, there were series of steps that were applied on power query. 
-1. First row was promoted as headers. 
-2. All column value types were specified so that Power query can summarize their data appropriately.
+The following transformations were applied: 
+1. Promoted the first row to headers. 
+2. Specified appropriate data types for each column.
+
+This produced a structured project-level dataset containing file size and Revit link information.
 
 ### C. Warnings Data 
 
@@ -164,16 +270,26 @@ For data cleaning of ProjectInfo data set, there were series of steps that were 
 **After Cleaning and Transformation**  
 ![NewWarningsData](images/NewWarningsData.png)
 
-**Applied steps on Power Query**  
+**Applied steps**  
 ![AppliedStepsPowerBI_Warnings](images/AppliedStepsPowerBI_Warnings.png)  
 
-For data cleaning of ProjectInfo data set, there were series of steps that were applied on power query. 
-1. First row was promoted as headers. 
-2. All column value types were specified so that Power query can summarize their data appropriately.
-3. Addition of a Severity column. 
+The following transformations were applied:
+1. Promoted the first row to headers. 
+2. Specified appropriate data types for each column.
+3. Added a Severity column to support warning analysis.
 
-For the Warning Data Set, a new column "Severity" was added. This will help bring focus to warning descriptions that were more critical than the rest. This was done through classifying the types of warnings from High, Medium, and Low. The basis of the classification are keywords. For High Severity, keywords such as overlapping, duplicate id, duplicate mark, and invalid were used. For Medium Severity, keywords such as diconnected, misses, non connected, no interesect were used. For Low Severity, those that were not classified to high and medium were classified under this. DAX formula is shown below. 
+### Warning Severity Classification
+A rule-based severity classification was introduced to help distinguish warning types within the dashboard.
 
+The classification uses keywords found in the warning descriptions:
+
+- High — keywords associated with conditions such as overlapping elements, duplicate IDs, duplicate marks, corruption, or invalid conditions.
+- Medium — keywords associated with conditions such as disconnected, unconnected, not enclosed, or constraint-related issues.
+- Low — warnings that do not match the defined High or Medium keyword groups.
+
+Note: This classification is a project-defined analytical heuristic, not an official Revit severity rating. Its purpose is to provide a consistent method for grouping warnings for dashboard analysis.
+
+The classification was implemented using a Power Query M expression:
 ```diff
 = Table.AddColumn(#"Specify column types", "Severity", each let
 text = if [Warnings] = null then "" else Text.Lower(Text.From([Warnings]))
@@ -209,27 +325,165 @@ else
 ```
 
 ## 📊 3. Power BI Dashboard
-I divided the dashboard into 3 sections, namely the Executive Model Insights, Asset Metadata Matrix, and Model Compliance & Risk Tracker.  
+The processed datasets were brought into Power BI and organized into three analytical sections:
+1. Executive Model Insights
+2. Asset Metadata Matrix
+3. Model Compliance & Risk Tracker
+
+Together, these pages provide different levels of interaction, from high-level model overview to element-level metadata and warning analysis.
+
+
+
 
 ### A. Executive Model Insights 
 ![Demo for Executive Model Insights](images/ExecutiveModelInsightsDemo.gif)  
-The executive model insights gives an overview of the model and its elements. It gives users an ability to visually view 3D model elements through the speckle visual and be able to filter it based on category, family, type, and level through the slicers found on the bottom. Through the power of speckle, users can rotate, cut the model in sections, and be able to select elements and have a tool tip detail about their element ID, category, family, type, and level. On the right are the bar charts showing elements per category and per level. On the top, there is a summary card showing the file size, number of links, number of elements, category, and families. Except for the file size, and number of links, the rest of the card value will vary based on the interaction with the bar charts and slicers found on the bottom. 
+The Executive Model Insights page provides a high-level overview of the Revit model and its physical elements. The page combines interactive 3D visualization through the Speckle visual with Power BI filtering and summary metrics.
 
-In a project setting, this will be helpful on giving stakeholders an overview of the model in terms of seeing the model progress visually through the speckle visual and having the element summary through the numbers shown on the cards and charts. Filtering gives more freedom and power to the users to be able to specify based on the information that they need. File sizes and number of links are useful information in terms maintaining model performance. 
+Users can filter model elements using:
+- Category
+- Family
+- Type
+- Level
+
+The Speckle visualization allows users to interact with the 3D model by:
+- Rotating the view
+- Cutting sections
+- Selecting individual elements
+- Viewing element information through tooltips
+
+Tooltips provide additional information including:
+- Element ID
+- Category
+- Family
+- Type
+- Level
+
+Bar charts provide additional breakdowns of elements by:
+- Category
+- Level
+
+Summary cards provide model-level information including:
+- File size
+- Number of links
+- Number of elements
+- Categories
+- Families
+
+The element-related metrics respond to the selected filters and visual interactions, while file size and link count remain model-level indicators.
+
+### Practical Application
+This page provides stakeholders with a consolidated view of the model without requiring them to navigate the Revit environment directly. The combination of 3D visualization, filtering, charts, and summary metrics can support model review by allowing users to explore the distribution and characteristics of model elements. File size and link count also provide basic indicators that can be monitored as part of model management and performance review.
 
 ### B. Asset Data Matrix
 ![Dashboard Page for Asset Data Matrix](images/AssetMetadataMatrixDemo.gif) 
-Asset metadata matrix gives a deep dive into these parameter values by showing full parameter details per element ID. These can be filtered through category, family, type, level, and phase created. Additional info such as phase created, area, length, volume, mark, workset, and comments are also included in the table. These can also be sorted based on parameter value. Number of rows on the bottom would vary based on the filters selected. 
 
-This is particularly helpful to see the completeness of the parameter values of elements. You can observe that there are also instances wherein there are blanks on the filters. Users can be able to pinpoint where the incomplete or blank values are coming from and be able to point out how many elements are affected through the number of rows value. In application, using these table as the basis, we can counter check the actual model through finding the element ID or creating a schedule of certain parameters such as category or family to be able to fill out or change the values. 
+The Asset Metadata Matrix provides an element-level view of the extracted Revit parameters.
+
+The matrix includes:
+- Element ID
+- Category
+- Family
+- Type
+- Level
+- Phase Created
+- Area
+- Length
+- Volume
+- Mark
+- Workset
+- Comments
+
+Users can filter the dataset by:
+- Category
+- Family
+- Type
+- Level
+- Phase Created
+
+The table can also be sorted based on individual parameter values. The row count displayed at the bottom changes according to the active filters, allowing users to see how many elements are included within the current selection.
+
+### Practical Application
+This page can be used to review the completeness and consistency of element metadata. Blank or incomplete parameter values can be identified through the filters and matrix. Once an affected Element ID has been identified, the corresponding element can be located in Revit for further investigation or correction. The extracted dataset can therefore serve as a supporting reference for model quality review and parameter completeness checks.
 
 ### C. Model Compliance & Risk Tracker 
 ![Dashboard Page for Asset Data Matrix](images/Dashboard_ModelCompliance&RiskTrackerDemo.gif)
-The model compliance and risk tracker shows the model warning descriptions, affected elements, and their severity classification while also having a visual of the elements selected. The speckle visual shows the 3D models which could be filtered through the number of elements by severity pie chart or active compliance error log table. On the top, there is a summary card showing the number of warnings as classified by high, medium, and low severity. 
+The Model Compliance & Risk Tracker provides an interactive view of Revit warnings and their associated elements.
 
-In application, this is useful for stakeholders to be able to show and analyze model issues without the need of opening the actual model. The card summaries and chart make it easier for users to quantify the warnings by their severity. This highlights issues that should be given priority for resolution. 
+The page combines:
+- Warning descriptions
+- Affected Element IDs
+- Severity classification
+- Warning counts
+- Interactive 3D visualization
 
+The Speckle visual provides a 3D representation of the affected model elements.
 
+Users can filter the visualization through:
+- Severity summary
+- Active compliance error table
+
+Summary cards display the number of warnings classified as:
+- High
+- Medium
+- Low
+
+### Practical Application
+This page allows users to investigate model warnings without having to open the Revit model for every initial review. The warning table provides a direct connection between a warning description and the affected Element ID, while the severity classification provides a structured way to group and review the warning dataset. The combination of warning counts, tabular information, filtering, and 3D visualization can help stakeholders identify and investigate model issues more efficiently.
+
+### 🔗 End-to-End Workflow
+The complete pipeline can be summarized as:
+┌──────────────────┐
+│   REVIT MODEL    │
+│  BIM Source Data │
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────┐
+│      DYNAMO      │
+│ Data Extraction  │
+│ + Python / API   │
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────┐
+│   CSV DATASETS   │
+│                  │
+│ Model Parameters │
+│ Project Info     │
+│ Warnings         │
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────┐
+│   POWER QUERY    │
+│ Clean & Transform│
+│ + Classification │
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────┐
+│     POWER BI     │
+│ Data Model +     │
+│ Visualization    │
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────┐
+│  BIM ANALYTICS   │
+│                  │
+│ Model Insights   │
+│ Asset Metadata   │
+│ Compliance/Risk  │
+└──────────────────┘
+
+### 🎯 Project Outcome
+The completed workflow demonstrates an end-to-end approach to transforming BIM information into structured, interactive analytics.
+
+Rather than relying solely on the Revit interface, the pipeline separates the process into distinct stages:
+
+Extract → Transform → Analyze → Visualize
+
+This workflow demonstrates how BIM authoring data can be connected with data preparation and business intelligence tools to support model review, metadata analysis, and compliance monitoring.
 
 
 
