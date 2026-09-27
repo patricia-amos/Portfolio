@@ -209,15 +209,27 @@ else
 ```
 
 ## 📊 3. Power BI Dashboard
+I divided the dashboard into 3 sections, namely the Executive Model Insights, Asset Metadata Matrix, and Model Compliance & Risk Tracker.  
 
 ### A. Executive Model Insights 
-![Dashboard Page for Executive Model Insights](images/Dashboard_ExecutiveModelInsights.png) 
+![Demo for Executive Model Insights](images/ExecutiveModelInsightsDemo.gif)  
+
+The executive model insights gives an overview of the model and its elements. It gives users an ability to visually view 3D model elements through the speckle visual and be able to filter it based on category, family, type, and level through the slicers found on the bottom. Through the power of speckle, users can rotate, cut the model in sections, and be able to select elements and have a tool tip detail about their element ID, category, family, type, and level. On the right are the bar charts showing elements per category and per level. On the top, there is a summary card showing the file size, number of links, number of elements, category, and families. Except for the file size, and number of links, the rest of the card value will vary based on the interaction with the bar charts and slicers found on the bottom. 
+
+In a project setting, this will be helpful on giving stakeholders an overview of the model in terms of seeing the model progress visually through the speckle visual and having the element summary through the numbers shown on the cards and charts. Filtering gives more freedom and power to the users to be able to specify based on the information that they need. File sizes and number of links are useful information in terms maintaining model performance. 
 
 ### B. Asset Data Matrix
-![Dashboard Page for Asset Data Matrix](images/Dashboard_AssetMetadataMatrix.png) 
+![Dashboard Page for Asset Data Matrix](images/AssetMetadataMatrixDemo.gif) 
+
+Asset metadata matrix gives a deep dive into these parameter values by showing full parameter details per element ID. These can be filtered through category, family, type level, and phase created. Additional info such as phase created, area, length, volume, mark, workset, and comments are also included in the table. These can also be sorted through the categories. Number of rows on the bottom would vary based on the filters selected. 
+
+This is particularly helpful to see the completeness of the parameter values of elements. You can observe that there are also instances wherein there are blanks on the filters. Users can be able to pinpoint where the incomplete or blank values are coming from and be able to point out how many elements are affected through the number of rows value. In application, using these table as the basis, we can counter check the actual model through finding the element ID or creating a schedule of certain parameters such as category or family to be able to fill out or change the values. 
 
 ### C. Model Compliance & Risk Tracker 
 ![Dashboard Page for Asset Data Matrix](images/Dashboard_ModelCompliance&RiskTracker.png) 
+
+The model compliance and risk tracker shows the model warning descriptions, affected elements, and their severity classification while also having a visual of the elements involved. 
+
 
 
 
