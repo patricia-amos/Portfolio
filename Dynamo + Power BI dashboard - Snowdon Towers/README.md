@@ -210,9 +210,15 @@ else
 
 ## 📊 3. Power BI Dashboard
 
+### A. Executive Model Insights 
+![Dashboard Page for Executive Model Insights](images/Dashboard_ExecutiveModelInsights.png) 
 
+### B. Asset Data Matrix
+![Dashboard Page for Asset Data Matrix](images/Dashboard_AssetMetadataMatrix.png) 
 
-### Dashboard Design
+### C. Model Compliance & Risk Tracker 
+![Dashboard Page for Asset Data Matrix](images/Dashboard_ModelCompliance&RiskTracker.png) 
+
 
 
 
