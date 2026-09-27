@@ -9,9 +9,9 @@ The project demonstrates how BIM data can be transformed from raw model informat
 This project demonstrates a reproducible workflow for extracting, transforming, and analyzing BIM data from an Autodesk Revit model.
 
 The pipeline focuses on three areas:  
-BIM data extraction — extracting model elements, project information, and Revit warnings through Dynamo.  
-Data preparation — cleaning and transforming the extracted datasets using Power Query.  
-BIM analytics and visualization — presenting model metadata, element information, and compliance indicators through Power BI.  
+**BIM data extraction** — extracting model elements, project information, and Revit warnings through Dynamo.  
+**Data preparation** — cleaning and transforming the extracted datasets using Power Query.  
+**BIM analytics and visualization** — presenting model metadata, element information, and compliance indicators through Power BI.  
 
 ### Revit Model
 To protect project confidentiality and intellectual property, this pipeline was developed and tested using Autodesk's Revit sample architecture project, Snowdon Towers Sample Architectural.rvt.
@@ -213,11 +213,7 @@ The workflow uses:
 - `Warning.GetFailingElements`
 - `Element.Id`
 
-A challenge occurred because a single warning description can affect multiple elements. Consequently, the number of warning descriptions did not initially match the number of affected element IDs.
-
-To align the datasets, List.Flatten, List.OfRepeatedItem, and List.Count were used to repeat each warning description according to the number of affected elements.
-
-The warning description was also formatted before export to prevent commas within descriptions from being interpreted as unintended CSV separators.
+A challenge occurred because a single warning description can affect multiple elements. Consequently, the number of warning descriptions did not initially match the number of affected element IDs. To align the datasets, List.Flatten, List.OfRepeatedItem, and List.Count were used to repeat each warning description according to the number of affected elements. The warning description was also formatted before export to prevent commas within descriptions from being interpreted as unintended CSV separators.
 
 The resulting dataset was exported as:
 `Warnings.csv`
@@ -331,8 +327,6 @@ The processed datasets were brought into Power BI and organized into three analy
 3. Model Compliance & Risk Tracker
 
 Together, these pages provide different levels of interaction, from high-level model overview to element-level metadata and warning analysis.
-
-
 
 
 ### A. Executive Model Insights 
