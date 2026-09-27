@@ -431,32 +431,16 @@ Summary cards display the number of warnings classified as:
 This page allows users to investigate model warnings without having to open the Revit model for every initial review. The warning table provides a direct connection between a warning description and the affected Element ID, while the severity classification provides a structured way to group and review the warning dataset. The combination of warning counts, tabular information, filtering, and 3D visualization can help stakeholders identify and investigate model issues more efficiently.
 
 ### 🔗 End-to-End Workflow
-The complete pipeline can be summarized as:
-```mermaid
-flowchart TD
-    A["🏢 Revit Model"] --> B["⚡ Dynamo"]
+The complete pipeline can be summarized as:  
 
-    B --> B1["Python / Revit API"]
-    B --> C["📄 CSV Datasets"]
+| Stage | Tool | Process | Output |
+|---|---|---|---|
+| **1. BIM Source** | Autodesk Revit | Provides the BIM model and source information | Revit Model |
+| **2. Data Extraction** | Dynamo + Python / Revit API | Collects model elements, project information, and warnings | CSV Datasets |
+| **3. Data Preparation** | Power Query | Cleans, transforms, and classifies the extracted data | Cleaned Datasets |
+| **4. Analytics** | Power BI | Models and visualizes the processed BIM data | Interactive Dashboard |
+| **5. BIM Analytics** | Power BI + Speckle | Combines BIM data with interactive 3D visualization | Model Insights & Compliance Analysis |
 
-    C --> C1["ModelParameters.csv"]
-    C --> C2["ProjectInfo.csv"]
-    C --> C3["Warnings.csv"]
-
-    C --> D["🧼 Power Query"]
-
-    D --> D1["Data Type Specification"]
-    D --> D2["Value Cleaning"]
-    D --> D3["Text Transformation"]
-    D --> D4["Warning Classification"]
-
-    D --> E["📊 Power BI"]
-
-    E --> E1["Executive Model Insights"]
-    E --> E2["Asset Metadata Matrix"]
-    E --> E3["Model Compliance & Risk Tracker"]
-
-    E --> F["🎯 BIM Data Analytics"]
 
 ### 🎯 Project Outcome
 The completed workflow demonstrates an end-to-end approach to transforming BIM information into structured, interactive analytics.
