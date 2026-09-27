@@ -10,8 +10,7 @@ Using a widely recognized open baseline allows peers and recruiters to easily re
 - **Autodesk Revit 2025** — BIM model and source data
 - **Dynamo v.3.3.0** — Automated Revit data extraction
 - **Power Query** — Data cleaning and transformation
-- **Power BI** — Data modeling and dashboard visualization
-- **DAX** — Calculations and KPI measures
+- **Power BI 2025** — Data modeling and dashboard visualization
 - **GitHub** — Project documentation and version control
 
 
@@ -19,7 +18,7 @@ Using a widely recognized open baseline allows peers and recruiters to easily re
 
 There are 3 data sets that were extracted from the Revit file through dynamo. 
 
-### ModelParameters Dynamo Graph
+### A. ModelParameters Dynamo Graph
 ![Dynamo Graph for ModelParameters Data Set](images/ModelParametersDynamo.png)
 
 [View ModelParameters dynamo script](dynamo/ModelParameters.dyn)
@@ -99,58 +98,119 @@ for elem in collector:
 OUT = physical_elements
 ```
 
-Next part of the script is extracting element parameter values for element type, ID, name, category, level, area, volume, length, mark, comments, phase created, and workset. These were collected through the nodes *Element.Id, Element.ElementType, ELement.Name, ELement.GetCategory, amd Parameter.ParameterByName*. 
+Next part of the script is extracting element parameter values for element type, ID, name, category, level, area, volume, length, mark, comments, phase created, and workset. These were collected through the nodes *Element.Id, Element.ElementType, ELement.Name, ELement.GetCategory, and Parameter.ParameterByName*. 
 
-It's important to take note that there were commas observed on element names so it was removed through the node *String.Replace* which is found after *Element.Name*. Since the output is a csv (comma separated value) file, removing the commas would ensure that the values extracted for element name would be recognized as one value and no more than that. 
+It's important to take note that there were commas observed on element names so it was removed through the node *String.Replace*. Since the output is a csv (comma separated value) file, removing the commas would ensure that the values extracted for element name would be recognized as one value and no more than that. 
 
-After the parameter values were collected these were placed on a list through the node List Create and transposed through *List.Transpose* so that every parameter type would have their own column and on each row would be the parameter values for each element. A manual code block for the column names were also created through *List Create* and added on the first row through *List.AddItemToFront*. 
+After the parameter values were collected these were placed on a list through the node *List Create* and transposed through *List.Transpose* so that every parameter type would have their own column and on each row would be the parameter values for each element. Column names were also added through *List Create* and placed on the first row through *List.AddItemToFront*. 
 
 This list would then be exported through *Data.ExportCSV* and the file path is specified through the node *File Location*. Final output for this section would be a ModelParameters.csv file. 
 
-### ProjectInfo&Warnings Dynamo Graph
+### B. ProjectInfo&Warnings Dynamo Graph
 
 
 [View ProjectInfo&Warnings dynamo script](dynamo/ProjectInfo&Warnings.dyn)
 
-These two data sets are combined in ProjectInfo&Warnings.dyn. The ProjectInfo.csv file contains the file size and the number of links inside the revit file while the Warnings.csv file contains revit warnings and their corresponding element ID. 
+Two data sets were combined in ProjectInfo&Warnings.dyn. The ProjectInfo.csv file contains the file size and the number of links inside the revit file while the Warnings.csv file contains revit warnings and their corresponding element ID. 
 
 ![Dynamo Graph for ProjectInfo Data Set](images/ProjectInfoDynamo.png)
 
-Starting with the project info, the dynamo script for this is simple. To get the number of links, I started with the *Document.Current* node to get the active project document then *Document.GetlinkInstances* to retrieve revit link instances in the present document and *List.Count* to count the number of links given by *Document.GetlinkInstances* that would give us a number output. To get the file size, I also started with *Document.Current* to get the active project document but for this one I used this node to be able to retrieve the actual file on my local through *Document.FilePath* and *File from path*. This is connected to the *FileSystem.FileSize* node to be able to get the file size in mb. The file size and number of links will be then arranged into a list and exported as csv as ProjectInfo.csv. 
+Starting with the project info, the dynamo script for this is simple. To get the number of links, I started with the *Document.Current* node to get the active project document then *Document.GetlinkInstances* to retrieve revit link instances in the present document and *List.Count* to count the number of links given by *Document.GetlinkInstances* that would give us a number output. To get the file size, I also started with *Document.Current* to get the active project document. But for this one I used this node to be able to retrieve the actual file on my local through *Document.FilePath* and *File from path*. This is connected to the *FileSystem.FileSize* node to be able to get the file size in mb. The file size and number of links would then be arranged into a list and exported as csv as ProjectInfo.csv. 
 
 ![Dynamo Graph for Warnings Data Set](images/WarningsDynamo.png)
-For the warnings file, nodes *Warning.GetWarnings*, *Warning.Description*, and *Warning.GetFailingElements* were used to get the warning descriptions and the corresponding elements that were affected by the warnings. I got the elements IDs through *Element.Id*. I observed that there are warning descriptions that would affect one or more elements. The numbers of items on the element ids list and the warning descriptions wouldn't match because the corresponding elements were grouped together based on their description. To fix this, I generated a new list for the warning description through using the nodes *List.Flatten*, *List.OfRepeatedItem*, and *List.Count*. This new list would duplicate the warning descriptions for those affected element ids resulting to the same number of items for the element ids list. I used a code block to enclose the description with double paretheses to ensure that the csv file would read per description as one input since the output file would be a csv file and commas can be possibly read as a separator. After this, the warnings descriptions and element ids would be arranged in a list and exported as Warnings.csv. 
+For the warnings file, nodes *Warning.GetWarnings*, *Warning.Description*, and *Warning.GetFailingElements* were used to get the warning descriptions and the corresponding elements that were affected by the warnings. I got the elements IDs through *Element.Id*. I observed that there were warning descriptions that would affect one or more elements. The numbers of items on the element id list and the warning descriptions wouldn't match because the corresponding elements were grouped together based on their description. To fix this, I generated a new list for the warning descriptions through using the nodes *List.Flatten*, *List.OfRepeatedItem*, and *List.Count*. This new list would duplicate the warning descriptions for those affected element ids resulting to the same number of items for the element id list. I used a code block to enclose the description with double paretheses to ensure that the csv file would read per description as one input since the output file would be a csv file and commas could be possibly read as a separator. After this, the warnings descriptions and element ids would be arranged in a list and exported as Warnings.csv. 
 
-## 🧼 2. Data Cleaning with Power Query
+## 🧼 2. Data Cleaning and Transformation with Power Query
 
-### Before Cleaning
+
+### A. ModelsParameter Data 
+
+**Before Cleaning and Transformation**
 ![OldModelParametersData](images/OldModelParametersData.png)
 
-*check power bi steps for blanks and empty cells
-
-### After Cleaning
+**After Cleaning and Transformation**
 ![NewModelParametersData_1](images/NewModelParametersData_1.png)
 ![NewModelParametersData_2](images/NewModelParametersData_2.png)
 
-For data cleaning of ModelsParameter data set, there are series of steps that were applied on power query. 
+**Applied steps on Power Query**  
 ![AppliedStepsPowerBI_ModelExport](images/AppliedStepsPowerBI_ModelExport.png)
 
-1. First row is promoted as headers. This is to officially recognize that the first row is the column names.
-2. All column value types are specified so that Power query can summarize their date appropriately.
-3. It was observed that for Phase Created, Comments, Mark, Lenth, Volume, Area, and Level, the values per row also contains the column name ie. "Level : Level 2". So for these columns we just find the column names and replace them with a blank to be able to remove them.
+For data cleaning of ModelsParameter data set, there were series of steps that were applied on power query. 
+1. First row was promoted as headers. This was to recognize that the first row was the column names.
+2. All column value types were specified so that Power query can summarize their data appropriately.
+3. It was observed that for Phase Created, Comments, Mark, Length, Volume, Area, and Level, the values per row also contains the column name ie. "Level : Level 2". So for these columns I applied find and replace, find the column names and replace them with a blank to be able to remove them.
 4. Last were trimming of the trailing and leading spaces. 
 
+### B. ProjectInfo Data 
 
-![AppliedStepsPowerBI_Warnings](images/AppliedStepsPowerBI_Warnings.png)
-For the Warning Data Set, a new column "Severity" was added. This will help bring focus to warning descriptions that are more critical than the rest. This is done through classifying the types of warnings that the model will have from High, Medium, and Low. The basis of the classification are keywords. For High Severity, keywords such as ......, for Medium Severity, keywords such as, and for Low Severity, those that are not classified to high and medium. Formula as shown below....
+**Before Cleaning and Transformation**  
+![OldProjectInfoData](images/OldProjectInfoData.png)
 
-Paste formula here 
+**After Cleaning and Transformation**  
+![NewWProjectInfoData](images/NewProjectInfoData.png)
+
+**Applied steps on Power Query**  
+![AppliedStepsPowerBI_ProjectInfo](images/AppliedStepsPowerBI_ProjectInfo.png)  
+
+For data cleaning of ProjectInfo data set, there were series of steps that were applied on power query. 
+1. First row was promoted as headers. 
+2. All column value types were specified so that Power query can summarize their data appropriately.
+
+### C. Warnings Data 
+
+**Before Cleaning and Transformation**  
+![OldWarningsData](images/OldWarningsData.png)
+
+**After Cleaning and Transformation**  
+![NewWarningsData](images/NewWarningsData.png)
+
+**Applied steps on Power Query**  
+![AppliedStepsPowerBI_Warnings](images/AppliedStepsPowerBI_Warnings.png)  
+
+For data cleaning of ProjectInfo data set, there were series of steps that were applied on power query. 
+1. First row was promoted as headers. 
+2. All column value types were specified so that Power query can summarize their data appropriately.
+3. Addition of a Severity column. 
+
+For the Warning Data Set, a new column "Severity" was added. This will help bring focus to warning descriptions that were more critical than the rest. This was done through classifying the types of warnings from High, Medium, and Low. The basis of the classification are keywords. For High Severity, keywords such as overlapping, duplicate id, duplicate mark, and invalid were used. For Medium Severity, keywords such as diconnected, misses, non connected, no interesect were used. For Low Severity, those that were not classified to high and medium were classified under this. DAX formula is shown below. 
+
 ```diff
-Formula
+= Table.AddColumn(#"Specify column types", "Severity", each let
+text = if [Warnings] = null then "" else Text.Lower(Text.From([Warnings]))
+in
+if Text.Contains(text, "overlapping")
+or Text.Contains(text, "overlap")
+or Text.Contains(text, "identical")
+or Text.Contains(text, "duplicate id")
+or Text.Contains(text, "corrupt")
+or Text.Contains(text, "duplicate mark")
+or Text.Contains(text, "duplicate ""mark""")
+or Text.Contains(text, "cannot keep")
+or Text.Contains(text, "invalid")
+then
+"High"
+else if Text.Contains(text, "axis")
+or Text.Contains(text, "bounded")
+or Text.Contains(text, "disconnected")
+or Text.Contains(text, "misses")
+or Text.Contains(text, "not connected")
+or Text.Contains(text, "not enclosed")
+or Text.Contains(text, "not joined")
+or Text.Contains(text, "not properly connected")
+or Text.Contains(text, "unconnected height")
+or Text.Contains(text, "base constraint")
+or Text.Contains(text, "top constraint")
+or Text.Contains(text, "top is not connected")
+or Text.Contains(text, "not intersect")
+then
+"Medium"
+else
+"Low")
 ```
 
-
 ## 📊 3. Power BI Dashboard
+
+
 
 ### Dashboard Design
 
