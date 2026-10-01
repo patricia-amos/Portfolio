@@ -18,6 +18,8 @@ To protect project confidentiality and intellectual property, this pipeline was 
 
 Using a standardized sample model provides a reproducible baseline that allows peers to understand and locally recreate the workflow without relying on proprietary project data. Using a widely recognized open baseline allows peers to easily reproduce the entire pipeline locally.
 
+Note: All architectural assets, parameters, and design structures are copyright of Autodesk, Inc. This data is published strictly for non-commercial educational and workflow portfolio purposes.
+
 ### Project Objectives
 The primary objectives of the project are to:
 
