@@ -1,0 +1,536 @@
+{
+  "Uuid": "1f88ea2b-9ef8-4764-a76b-05e1c567e4bb",
+  "IsCustomNode": false,
+  "Description": "",
+  "Name": "PopulateMultipleSheetParameters",
+  "ElementResolver": {
+    "ResolutionMap": {}
+  },
+  "Inputs": [
+    {
+      "Id": "a3d8599bc544425880ce11da0c20cb83",
+      "Name": "Filter Parameter Name",
+      "Type": "string",
+      "Type2": "string",
+      "Value": "Filter Grouping",
+      "Description": "Creates a string"
+    },
+    {
+      "Id": "17a71ddbfd8b4c3b848d2f9b246133e8",
+      "Name": "Filter Parameter Value",
+      "Type": "string",
+      "Type2": "string",
+      "Value": "Group1",
+      "Description": "Creates a string"
+    }
+  ],
+  "Outputs": [],
+  "Nodes": [
+    {
+      "ConcreteType": "DSRevitNodesUI.Categories, DSRevitNodesUI",
+      "SelectedIndex": 530,
+      "SelectedString": "OST_Sheets",
+      "Id": "8aae327b765c4cc0ade2f8dacfd69751",
+      "NodeType": "ExtensionNode",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "53a50b30403f433f9043e482093a376f",
+          "Name": "Category",
+          "Description": "The selected Category.",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "All built-in categories."
+    },
+    {
+      "ConcreteType": "DSRevitNodesUI.ElementsOfCategory, DSRevitNodesUI",
+      "Id": "96e763063d114403bb6938249f664d32",
+      "NodeType": "ExtensionNode",
+      "Inputs": [
+        {
+          "Id": "8d4a4584898047f1bafe903dcd074f85",
+          "Name": "Category",
+          "Description": "The Category",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "3c407c47f9ba44afa47f0e2cd40cb8bc",
+          "Name": "Elements",
+          "Description": "An element class.",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Get all elements of the specified category from the model."
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.ZeroTouch.DSFunction, DynamoCore",
+      "Id": "82526f04ad1541109e97fc64692d8579",
+      "NodeType": "FunctionNode",
+      "Inputs": [
+        {
+          "Id": "3ff39f202d5c4f2a88c9cced242c8995",
+          "Name": "element",
+          "Description": "Revit.Elements.Element",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "f7c326d41721465887bfb11c348d422d",
+          "Name": "parameterName",
+          "Description": "The name of the parameter whose value you want to obtain.\n\nstring",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "b8f04016172f471392f5d04ed5007f53",
+          "Name": "var[]..[]",
+          "Description": "var[]..[]",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "FunctionSignature": "Revit.Elements.Element.GetParameterValueByName@string",
+      "Replication": "Auto",
+      "Description": "Get the value of one of the element's parameters.\n\nElement.GetParameterValueByName (parameterName: string): var[]..[]"
+    },
+    {
+      "ConcreteType": "CoreNodeModels.Input.StringInput, CoreNodeModels",
+      "Id": "a3d8599bc544425880ce11da0c20cb83",
+      "NodeType": "StringInputNode",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "ec8b3e720f4d43be9b2627dfd101496b",
+          "Name": "",
+          "Description": "String",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Creates a string",
+      "InputValue": "Filter Grouping"
+    },
+    {
+      "ConcreteType": "PythonNodeModels.PythonNode, PythonNodeModels",
+      "Code": "import clr\r\nclr.AddReference('PresentationFramework')\r\nclr.AddReference('PresentationCore')\r\nclr.AddReference('WindowsBase')\r\n\r\nimport System\r\nfrom System.Windows import Window, Thickness, HorizontalAlignment, VerticalAlignment, GridLength, GridUnitType, TextDecorations\r\nfrom System.Windows.Controls import Button, StackPanel, Grid, TextBox, TextBlock, ScrollViewer, ColumnDefinition\r\nfrom System.Windows.Documents import Run, Underline\r\nfrom System.Windows.Media import SolidColorBrush, Color\r\n\r\n# Revit API & Dynamo Imports\r\nclr.AddReference('RevitServices')\r\nfrom RevitServices.Persistence import DocumentManager\r\nfrom RevitServices.Transactions import TransactionManager\r\n\r\nclr.AddReference('RevitAPI')\r\nfrom Autodesk.Revit.DB import StorageType, ElementId\r\n\r\ndoc = DocumentManager.Instance.CurrentDBDocument\r\n\r\nraw_input = IN[0]\r\n\r\ndef set_param_value(param, val_str):\r\n    st = param.StorageType\r\n    if st == StorageType.String:\r\n        return param.Set(str(val_str))\r\n    elif st == StorageType.Integer:\r\n        v_clean = str(val_str).strip().lower()\r\n        if v_clean in ['true', 'yes', '1']:\r\n            return param.Set(1)\r\n        elif v_clean in ['false', 'no', '0']:\r\n            return param.Set(0)\r\n        return param.Set(int(v_clean))\r\n    elif st == StorageType.Double:\r\n        return param.Set(float(val_str))\r\n    elif st == StorageType.ElementId:\r\n        return param.Set(ElementId(int(val_str)))\r\n    return False\r\n\r\nOUT = []\r\n\r\ntry:\r\n    if raw_input is None:\r\n        OUT = \"Error: Input IN[0] is None.\"\r\n    else:\r\n        wrapped_sheets = raw_input if isinstance(raw_input, list) else [raw_input]\r\n        wrapped_sheets = [s for s in wrapped_sheets if s is not None]\r\n\r\n        if len(wrapped_sheets) == 0:\r\n            OUT = \"Error: Input list IN[0] contains no valid sheets.\"\r\n        else:\r\n            db_sheets = []\r\n            for s in wrapped_sheets:\r\n                if hasattr(s, \"InternalElement\"):\r\n                    db_sheets.append(s.InternalElement)\r\n                else:\r\n                    db_sheets.append(s)\r\n\r\n            # -------------------------------------------------------------\r\n            # MAIN INPUT UI\r\n            # -------------------------------------------------------------\r\n            win = Window()\r\n            win.Title = \"Set Parameters for Selected Sheets\"\r\n            win.Width = 560\r\n            win.Height = 450\r\n            win.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen\r\n\r\n            main_stack = StackPanel()\r\n            main_stack.Margin = Thickness(15)\r\n\r\n            header = TextBlock()\r\n            header.Text = f\"Targeting {len(db_sheets)} Sheet(s)\"\r\n            header.FontSize = 14\r\n            header.FontWeight = System.Windows.FontWeights.Bold\r\n            header.Margin = Thickness(0, 0, 0, 10)\r\n            main_stack.Children.Add(header)\r\n\r\n            rows_panel = StackPanel()\r\n            param_row_controls = []\r\n\r\n            def add_parameter_row(default_name=\"\", default_val=\"\"):\r\n                grid = Grid()\r\n                grid.Margin = Thickness(0, 0, 0, 8)\r\n\r\n                col1 = ColumnDefinition()\r\n                col1.Width = GridLength(1.0, GridUnitType.Star)\r\n                col2 = ColumnDefinition()\r\n                col2.Width = GridLength(1.0, GridUnitType.Star)\r\n                col3 = ColumnDefinition()\r\n                col3.Width = GridLength(40, GridUnitType.Pixel)\r\n\r\n                grid.ColumnDefinitions.Add(col1)\r\n                grid.ColumnDefinitions.Add(col2)\r\n                grid.ColumnDefinitions.Add(col3)\r\n\r\n                tb_name = TextBox()\r\n                tb_name.Text = default_name\r\n                tb_name.Margin = Thickness(0, 0, 5, 0)\r\n                tb_name.Height = 26\r\n                tb_name.VerticalContentAlignment = VerticalAlignment.Center\r\n                Grid.SetColumn(tb_name, 0)\r\n\r\n                tb_val = TextBox()\r\n                tb_val.Text = default_val\r\n                tb_val.Margin = Thickness(5, 0, 5, 0)\r\n                tb_val.Height = 26\r\n                tb_val.VerticalContentAlignment = VerticalAlignment.Center\r\n                Grid.SetColumn(tb_val, 1)\r\n\r\n                btn_del = Button()\r\n                btn_del.Content = \"✕\"\r\n                btn_del.Height = 26\r\n                btn_del.Margin = Thickness(5, 0, 0, 0)\r\n                btn_del.Background = SolidColorBrush(Color.FromRgb(240, 128, 128))\r\n                Grid.SetColumn(btn_del, 2)\r\n\r\n                def remove_row(sender, e):\r\n                    rows_panel.Children.Remove(grid)\r\n                    if (tb_name, tb_val) in param_row_controls:\r\n                        param_row_controls.remove((tb_name, tb_val))\r\n\r\n                btn_del.Click += remove_row\r\n\r\n                grid.Children.Add(tb_name)\r\n                grid.Children.Add(tb_val)\r\n                grid.Children.Add(btn_del)\r\n\r\n                rows_panel.Children.Add(grid)\r\n                param_row_controls.append((tb_name, tb_val))\r\n\r\n            header_grid = Grid()\r\n            header_grid.Margin = Thickness(0, 0, 0, 5)\r\n            \r\n            c1 = ColumnDefinition()\r\n            c1.Width = GridLength(1.0, GridUnitType.Star)\r\n            c2 = ColumnDefinition()\r\n            c2.Width = GridLength(1.0, GridUnitType.Star)\r\n            c3 = ColumnDefinition()\r\n            c3.Width = GridLength(40, GridUnitType.Pixel)\r\n            \r\n            header_grid.ColumnDefinitions.Add(c1)\r\n            header_grid.ColumnDefinitions.Add(c2)\r\n            header_grid.ColumnDefinitions.Add(c3)\r\n\r\n            lbl1 = TextBlock()\r\n            lbl1.Text = \"Parameter Name\"\r\n            lbl1.FontWeight = System.Windows.FontWeights.SemiBold\r\n            Grid.SetColumn(lbl1, 0)\r\n\r\n            lbl2 = TextBlock()\r\n            lbl2.Text = \"Value to Set\"\r\n            lbl2.FontWeight = System.Windows.FontWeights.SemiBold\r\n            Grid.SetColumn(lbl2, 1)\r\n\r\n            header_grid.Children.Add(lbl1)\r\n            header_grid.Children.Add(lbl2)\r\n            main_stack.Children.Add(header_grid)\r\n\r\n            scroll_view = ScrollViewer()\r\n            scroll_view.Height = 260\r\n            scroll_view.Content = rows_panel\r\n            main_stack.Children.Add(scroll_view)\r\n\r\n            btn_panel = StackPanel()\r\n            btn_panel.Orientation = System.Windows.Controls.Orientation.Horizontal\r\n            btn_panel.Margin = Thickness(0, 15, 0, 0)\r\n            btn_panel.HorizontalAlignment = HorizontalAlignment.Right\r\n\r\n            btn_add = Button()\r\n            btn_add.Content = \"+ Add Parameter\"\r\n            btn_add.Width = 120\r\n            btn_add.Height = 30\r\n            btn_add.Margin = Thickness(0, 0, 10, 0)\r\n\r\n            def on_add_click(sender, e):\r\n                add_parameter_row()\r\n\r\n            btn_add.Click += on_add_click\r\n            btn_panel.Children.Add(btn_add)\r\n\r\n            btn_apply = Button()\r\n            btn_apply.Content = \"Apply\"\r\n            btn_apply.Width = 80\r\n            btn_apply.Height = 30\r\n            btn_apply.Background = SolidColorBrush(Color.FromRgb(144, 238, 144))\r\n\r\n            def on_apply_click(sender, e):\r\n                win.DialogResult = True\r\n                win.Close()\r\n\r\n            btn_apply.Click += on_apply_click\r\n            btn_panel.Children.Add(btn_apply)\r\n\r\n            main_stack.Children.Add(btn_panel)\r\n            win.Content = main_stack\r\n\r\n            add_parameter_row(\"Drawn By\", \"\")\r\n\r\n            # -------------------------------------------------------------\r\n            # EXECUTION & REPORT GENERATION\r\n            # -------------------------------------------------------------\r\n            if win.ShowDialog() == True:\r\n                param_updates = []\r\n                for tb_name, tb_val in param_row_controls:\r\n                    p_name = tb_name.Text.strip()\r\n                    p_val = tb_val.Text\r\n                    if p_name:\r\n                        param_updates.append((p_name, p_val))\r\n\r\n                error_logs = []\r\n                successful_sheets = set()\r\n                successful_params = set()\r\n\r\n                TransactionManager.Instance.EnsureInTransaction(doc)\r\n\r\n                for sheet in db_sheets:\r\n                    s_num = getattr(sheet, \"SheetNumber\", str(sheet.Id))\r\n                    s_name = getattr(sheet, \"Name\", \"\")\r\n                    label = f\"{s_num} - {s_name}\" if s_name else s_num\r\n\r\n                    for p_name, p_val in param_updates:\r\n                        param = sheet.LookupParameter(p_name)\r\n                        \r\n                        if param is None:\r\n                            error_logs.append((p_name, f\"Parameter '{p_name}' does not exist on sheet {label}.\"))\r\n                        elif param.IsReadOnly:\r\n                            error_logs.append((p_name, f\"Parameter '{p_name}' is read-only on sheet {label}.\"))\r\n                        else:\r\n                            try:\r\n                                success = set_param_value(param, p_val)\r\n                                if success:\r\n                                    successful_sheets.add(label)\r\n                                    successful_params.add(p_name)\r\n                                else:\r\n                                    error_logs.append((p_name, f\"Failed to write value to parameter '{p_name}' on sheet {label}.\"))\r\n                            except Exception as ex:\r\n                                error_logs.append((p_name, f\"Error setting '{p_name}' on sheet {label}: {str(ex)}\"))\r\n\r\n                TransactionManager.Instance.TransactionTaskDone()\r\n                doc.Regenerate()\r\n\r\n                # -------------------------------------------------------------\r\n                # REPORT DIALOG POPUP\r\n                # -------------------------------------------------------------\r\n                report_win = Window()\r\n                report_win.Title = \"Execution Report\"\r\n                report_win.Width = 550\r\n                report_win.Height = 480\r\n                report_win.WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen\r\n\r\n                report_stack = StackPanel()\r\n                report_stack.Margin = Thickness(15)\r\n\r\n                report_scroll = ScrollViewer()\r\n                report_scroll.Height = 360\r\n                \r\n                inner_report_stack = StackPanel()\r\n\r\n                # 1. Error Section\r\n                if error_logs:\r\n                    err_header = TextBlock()\r\n                    err_header.Text = \"Errors & Missing Parameters:\"\r\n                    err_header.FontSize = 13\r\n                    err_header.FontWeight = System.Windows.FontWeights.Bold\r\n                    err_header.Foreground = SolidColorBrush(Color.FromRgb(200, 30, 30))\r\n                    err_header.Margin = Thickness(0, 0, 0, 5)\r\n                    inner_report_stack.Children.Add(err_header)\r\n\r\n                    for p_name, err in error_logs:\r\n                        err_txt = TextBlock()\r\n                        err_txt.Margin = Thickness(10, 0, 0, 3)\r\n                        err_txt.TextWrapping = System.Windows.TextWrapping.Wrap\r\n\r\n                        parts = err.split(f\"'{p_name}'\")\r\n                        if len(parts) == 2:\r\n                            err_txt.Inlines.Add(Run(f\"• {parts[0]}'\"))\r\n                            p_run = Run(p_name)\r\n                            p_run.TextDecorations = TextDecorations.Underline\r\n                            err_txt.Inlines.Add(p_run)\r\n                            err_txt.Inlines.Add(Run(f\"'{parts[1]}\"))\r\n                        else:\r\n                            err_txt.Inlines.Add(Run(f\"• {err}\"))\r\n\r\n                        inner_report_stack.Children.Add(err_txt)\r\n\r\n                    # Error Summary Footer at the Bottom of Error Section\r\n                    err_summary = TextBlock()\r\n                    err_summary.Text = f\"Total Errors Encountered: {len(error_logs)}\"\r\n                    err_summary.FontWeight = System.Windows.FontWeights.Bold\r\n                    err_summary.Foreground = SolidColorBrush(Color.FromRgb(200, 30, 30))\r\n                    err_summary.Margin = Thickness(10, 5, 0, 0)\r\n                    inner_report_stack.Children.Add(err_summary)\r\n\r\n                    sep = TextBlock()\r\n                    sep.Text = \"----------------------------------------------------------------------------------\"\r\n                    sep.Margin = Thickness(0, 10, 0, 10)\r\n                    sep.Foreground = SolidColorBrush(Color.FromRgb(180, 180, 180))\r\n                    inner_report_stack.Children.Add(sep)\r\n\r\n                # 2. Success Section\r\n                succ_header = TextBlock()\r\n                succ_header.FontSize = 13\r\n                succ_header.FontWeight = System.Windows.FontWeights.Bold\r\n                succ_header.Foreground = SolidColorBrush(Color.FromRgb(30, 140, 30))\r\n                succ_header.Margin = Thickness(0, 0, 0, 5)\r\n                succ_header.TextWrapping = System.Windows.TextWrapping.Wrap\r\n\r\n                succ_header.Inlines.Add(Run(\"Successful replacement of Parameters \"))\r\n\r\n                param_list = sorted(list(successful_params))\r\n                if not param_list:\r\n                    succ_header.Inlines.Add(Run(\"N/A\"))\r\n                else:\r\n                    for i, p_name in enumerate(param_list):\r\n                        u_run = Run(p_name)\r\n                        u_run.TextDecorations = TextDecorations.Underline\r\n                        succ_header.Inlines.Add(u_run)\r\n\r\n                        if len(param_list) == 2 and i == 0:\r\n                            succ_header.Inlines.Add(Run(\" and \"))\r\n                        elif i < len(param_list) - 2:\r\n                            succ_header.Inlines.Add(Run(\", \"))\r\n                        elif i == len(param_list) - 2:\r\n                            succ_header.Inlines.Add(Run(\", and \"))\r\n\r\n                succ_header.Inlines.Add(Run(\" for sheets:\"))\r\n                inner_report_stack.Children.Add(succ_header)\r\n\r\n                if successful_sheets:\r\n                    for s_label in sorted(list(successful_sheets)):\r\n                        succ_txt = TextBlock()\r\n                        succ_txt.Text = f\"• {s_label}\"\r\n                        succ_txt.Margin = Thickness(10, 0, 0, 3)\r\n                        inner_report_stack.Children.Add(succ_txt)\r\n                else:\r\n                    none_txt = TextBlock()\r\n                    none_txt.Text = \"• No sheet parameters were updated.\"\r\n                    none_txt.Margin = Thickness(10, 0, 0, 3)\r\n                    inner_report_stack.Children.Add(none_txt)\r\n\r\n                # Success Summary Footer at the Bottom of Success Section\r\n                succ_summary = TextBlock()\r\n                succ_summary.Text = f\"Total Sheets Successfully Updated: {len(successful_sheets)}\"\r\n                succ_summary.FontWeight = System.Windows.FontWeights.Bold\r\n                succ_summary.Foreground = SolidColorBrush(Color.FromRgb(30, 140, 30))\r\n                succ_summary.Margin = Thickness(10, 8, 0, 0)\r\n                inner_report_stack.Children.Add(succ_summary)\r\n\r\n                report_scroll.Content = inner_report_stack\r\n                report_stack.Children.Add(report_scroll)\r\n\r\n                # Close Button\r\n                btn_close = Button()\r\n                btn_close.Content = \"Close\"\r\n                btn_close.Width = 80\r\n                btn_close.Height = 30\r\n                btn_close.Margin = Thickness(0, 10, 0, 0)\r\n                btn_close.HorizontalAlignment = HorizontalAlignment.Right\r\n\r\n                def on_close_click(sender, e):\r\n                    report_win.Close()\r\n\r\n                btn_close.Click += on_close_click\r\n                report_stack.Children.Add(btn_close)\r\n\r\n                report_win.Content = report_stack\r\n                report_win.ShowDialog()\r\n\r\n                OUT = {\r\n                    \"TotalErrors\": len(error_logs),\r\n                    \"TotalUpdatedSheets\": len(successful_sheets),\r\n                    \"Errors\": [e[1] for e in error_logs],\r\n                    \"UpdatedSheets\": sorted(list(successful_sheets)),\r\n                    \"UpdatedParameters\": sorted(list(successful_params))\r\n                }\r\n            else:\r\n                OUT = \"Operation cancelled by user.\"\r\n\r\nexcept Exception as global_ex:\r\n    OUT = f\"Global Script Error: {str(global_ex)}\"",
+      "Engine": "CPython3",
+      "VariableInputPorts": true,
+      "Id": "975564ac7329442c9e2ecc5270ee0a07",
+      "NodeType": "PythonScriptNode",
+      "Inputs": [
+        {
+          "Id": "0ba2742fe6a4479397f8da815e1ae444",
+          "Name": "IN[0]",
+          "Description": "Input #0",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "d2c63ed9fe7c4f7494485fd34caa01aa",
+          "Name": "OUT",
+          "Description": "Result of the python script",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Runs an embedded Python script."
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.ZeroTouch.DSFunction, DynamoCore",
+      "Id": "daaa3a4a0c564d248f2f60bdf36c36ed",
+      "NodeType": "FunctionNode",
+      "Inputs": [
+        {
+          "Id": "a0c2c556e4e047a8a465240eb8ae30ce",
+          "Name": "list",
+          "Description": "List to filter.\n\nvar[]..[]",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "340ca4452a1844ec93e5ddca0d146a79",
+          "Name": "mask",
+          "Description": "List of booleans representing a mask.\n\nvar[]..[]",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "56564f017b01446392d599e1b2a31f2c",
+          "Name": "in",
+          "Description": "Items whose mask index is true.",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "78a9e804e18f4350ab9e6850a99bcb54",
+          "Name": "out",
+          "Description": "Items whose mask index is false.",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "FunctionSignature": "DSCore.List.FilterByBoolMask@var[]..[],var[]..[]",
+      "Replication": "Auto",
+      "Description": "Filters a sequence by looking up corresponding indices in a separate list of booleans.\n\nList.FilterByBoolMask (list: var[]..[], mask: var[]..[]): var[]..[]"
+    },
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.ZeroTouch.DSFunction, DynamoCore",
+      "Id": "edca254584eb4ee4ab6541fac4401a97",
+      "NodeType": "FunctionNode",
+      "Inputs": [
+        {
+          "Id": "620611fef2984fd4af68b85fb09bdbea",
+          "Name": "x",
+          "Description": "Basic type object to compare (e.g. bool, int, double, string, etc.)\n\nvar[]..[]",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "6b26ad5659894067a78dd4c6347c6b73",
+          "Name": "y",
+          "Description": "Basic type object to compare (e.g. bool, int, double, string, etc.)\n\nvar[]..[]",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "4c06049733134e7287582513d4fd1b35",
+          "Name": "bool",
+          "Description": "Result of equality check",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "FunctionSignature": "==@var[]..[],var[]..[]",
+      "Replication": "Auto",
+      "Description": "Compares if x and y are equal\n\n== (x: var[]..[], y: var[]..[]): var[]..[]"
+    },
+    {
+      "ConcreteType": "CoreNodeModels.Input.StringInput, CoreNodeModels",
+      "Id": "17a71ddbfd8b4c3b848d2f9b246133e8",
+      "NodeType": "StringInputNode",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "0e58ccc316a3402baa2dc0ac2b923c36",
+          "Name": "",
+          "Description": "String",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Creates a string",
+      "InputValue": "Group1"
+    }
+  ],
+  "Connectors": [
+    {
+      "Start": "53a50b30403f433f9043e482093a376f",
+      "End": "8d4a4584898047f1bafe903dcd074f85",
+      "Id": "93c1ec36fae84fa79d3d0b18675eefa0",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "3c407c47f9ba44afa47f0e2cd40cb8bc",
+      "End": "3ff39f202d5c4f2a88c9cced242c8995",
+      "Id": "a087b2a4868a4cb1b324f0dc50c647a6",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "3c407c47f9ba44afa47f0e2cd40cb8bc",
+      "End": "a0c2c556e4e047a8a465240eb8ae30ce",
+      "Id": "4cd5bcfc63614d09ab0f0011f41798a1",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "b8f04016172f471392f5d04ed5007f53",
+      "End": "620611fef2984fd4af68b85fb09bdbea",
+      "Id": "5cf96cd02c8346b6b1d2620e192f56e5",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "ec8b3e720f4d43be9b2627dfd101496b",
+      "End": "f7c326d41721465887bfb11c348d422d",
+      "Id": "b393ead87aed4056b000a3197dee98d0",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "56564f017b01446392d599e1b2a31f2c",
+      "End": "0ba2742fe6a4479397f8da815e1ae444",
+      "Id": "c6418b9126c84d759a2dd47f5a9bca46",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "4c06049733134e7287582513d4fd1b35",
+      "End": "340ca4452a1844ec93e5ddca0d146a79",
+      "Id": "507319d3bc0a401b802c343148a79af3",
+      "IsHidden": "False"
+    },
+    {
+      "Start": "0e58ccc316a3402baa2dc0ac2b923c36",
+      "End": "6b26ad5659894067a78dd4c6347c6b73",
+      "Id": "599b7018d42a4a02814f9f14c4692e61",
+      "IsHidden": "False"
+    }
+  ],
+  "Dependencies": [],
+  "NodeLibraryDependencies": [],
+  "EnableLegacyPolyCurveBehavior": true,
+  "Thumbnail": "",
+  "GraphDocumentationURL": null,
+  "ExtensionWorkspaceData": [
+    {
+      "ExtensionGuid": "28992e1d-abb9-417f-8b1b-05e053bee670",
+      "Name": "Properties",
+      "Version": "3.3",
+      "Data": {}
+    },
+    {
+      "ExtensionGuid": "DFBD9CC0-DB40-457A-939E-8C8555555A9D",
+      "Name": "Generative Design",
+      "Version": "8.2",
+      "Data": {}
+    }
+  ],
+  "Author": "",
+  "Linting": {
+    "activeLinter": "None",
+    "activeLinterId": "7b75fb44-43fd-4631-a878-29f4d5d8399a",
+    "warningCount": 0,
+    "errorCount": 0
+  },
+  "Bindings": [],
+  "View": {
+    "Dynamo": {
+      "ScaleFactor": 1.0,
+      "HasRunWithoutCrash": true,
+      "IsVisibleInDynamoLibrary": true,
+      "Version": "3.3.0.6316",
+      "RunType": "Manual",
+      "RunPeriod": "1000"
+    },
+    "Camera": {
+      "Name": "_Background Preview",
+      "EyeX": -17.0,
+      "EyeY": 24.0,
+      "EyeZ": 50.0,
+      "LookX": 12.0,
+      "LookY": -13.0,
+      "LookZ": -58.0,
+      "UpX": 0.0,
+      "UpY": 1.0,
+      "UpZ": 0.0
+    },
+    "ConnectorPins": [],
+    "NodeViews": [
+      {
+        "Id": "8aae327b765c4cc0ade2f8dacfd69751",
+        "Name": "Categories",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": -1391.5194874155545,
+        "Y": 18.31261016224488
+      },
+      {
+        "Id": "96e763063d114403bb6938249f664d32",
+        "Name": "All Elements of Category",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": -1028.8701608508047,
+        "Y": 24.25705390450446
+      },
+      {
+        "Id": "82526f04ad1541109e97fc64692d8579",
+        "Name": "Element.GetParameterValueByName",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": -243.83472882177057,
+        "Y": 136.5750841227075
+      },
+      {
+        "Id": "a3d8599bc544425880ce11da0c20cb83",
+        "Name": "Filter Parameter Name",
+        "IsSetAsInput": true,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": -534.6849414416811,
+        "Y": 280.86325043067274
+      },
+      {
+        "Id": "975564ac7329442c9e2ecc5270ee0a07",
+        "Name": "Parameter Replacement UI",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 905.6077609027859,
+        "Y": 15.439880677099609
+      },
+      {
+        "Id": "daaa3a4a0c564d248f2f60bdf36c36ed",
+        "Name": "List.FilterByBoolMask",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 490.16925851720737,
+        "Y": 12.618315547128418
+      },
+      {
+        "Id": "edca254584eb4ee4ab6541fac4401a97",
+        "Name": "==",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": 196.4744113509173,
+        "Y": 141.97128456853295
+      },
+      {
+        "Id": "17a71ddbfd8b4c3b848d2f9b246133e8",
+        "Name": "Filter Parameter Value",
+        "IsSetAsInput": true,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "ShowGeometry": true,
+        "X": -20.04154877502458,
+        "Y": 363.55454919341554
+      }
+    ],
+    "Annotations": [
+      {
+        "Id": "dec2bb14d8cf43adac0fee41681b57bb",
+        "Title": "Select All Sheet Elements",
+        "DescriptionText": "",
+        "IsExpanded": true,
+        "WidthAdjustment": 0.0,
+        "HeightAdjustment": 0.0,
+        "Nodes": [
+          "8aae327b765c4cc0ade2f8dacfd69751",
+          "96e763063d114403bb6938249f664d32"
+        ],
+        "HasNestedGroups": false,
+        "Left": -1401.5194874155545,
+        "Top": -54.68738983775512,
+        "Width": 639.6493265647498,
+        "Height": 210.94444374225958,
+        "FontSize": 36.0,
+        "GroupStyleId": "00000000-0000-0000-0000-000000000000",
+        "InitialTop": 18.31261016224488,
+        "InitialHeight": 167.94444374225958,
+        "TextblockHeight": 63.0,
+        "Background": "#FFC1D676"
+      },
+      {
+        "Id": "edad12b34eee4f75aed996b416ea718d",
+        "Title": "Filter sheet parameters through Filter Parameter Value",
+        "DescriptionText": "",
+        "IsExpanded": true,
+        "WidthAdjustment": 0.0,
+        "HeightAdjustment": 0.0,
+        "Nodes": [
+          "82526f04ad1541109e97fc64692d8579",
+          "a3d8599bc544425880ce11da0c20cb83",
+          "daaa3a4a0c564d248f2f60bdf36c36ed",
+          "edca254584eb4ee4ab6541fac4401a97",
+          "17a71ddbfd8b4c3b848d2f9b246133e8"
+        ],
+        "HasNestedGroups": false,
+        "Left": -544.6849414416811,
+        "Top": -60.38168445287158,
+        "Width": 1279.8541999588883,
+        "Height": 555.9362336462871,
+        "FontSize": 36.0,
+        "GroupStyleId": "4d68be4a-a04d-4945-9dd5-cdf61079d790",
+        "InitialTop": 12.618315547128418,
+        "InitialHeight": 512.9362336462871,
+        "TextblockHeight": 63.0,
+        "Background": "#FFB9F9E1"
+      },
+      {
+        "Id": "31c7456a99ce4dc7ba748dcead63269f",
+        "Title": "UI Parameter Replacement",
+        "DescriptionText": "",
+        "IsExpanded": true,
+        "WidthAdjustment": 0.0,
+        "HeightAdjustment": 0.0,
+        "Nodes": [
+          "975564ac7329442c9e2ecc5270ee0a07"
+        ],
+        "HasNestedGroups": false,
+        "Left": 895.6077609027859,
+        "Top": -100.56011932290039,
+        "Width": 294.0,
+        "Height": 248.0,
+        "FontSize": 36.0,
+        "GroupStyleId": "07655dc1-2d65-4fed-8d6a-37235d3e3a8d",
+        "InitialTop": 15.439880677099609,
+        "InitialHeight": 162.0,
+        "TextblockHeight": 106.0,
+        "Background": "#FFFFC999"
+      }
+    ],
+    "X": 906.0502878356718,
+    "Y": 306.2262315293007,
+    "Zoom": 0.632527700865848
+  }
+}
