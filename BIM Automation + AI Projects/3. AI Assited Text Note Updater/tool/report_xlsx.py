@@ -1,7 +1,7 @@
 """Excel report of the text notes that were ACTUALLY changed in the Revit model. Standard library only, so it
 runs inside Dynamo's Python (no openpyxl needed).
 
-Called by the write-back node (Node 4) after the changes were applied - never by the review screen:
+Called by the write-back node (Node 3) after the changes were applied - never by the review screen:
 
     write_report(approved, applied, results_path=None, out_path=None, out_folder=None) -> (path, rows_added, rows_replaced)
 

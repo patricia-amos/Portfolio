@@ -1,0 +1,86 @@
+[
+  {
+    "unique_id": "demo-001",
+    "element_id": 1001,
+    "sheet_number": "A101",
+    "view_name": "Level 1",
+    "text": "Contractor to verify dimensions on site."
+  },
+  {
+    "unique_id": "demo-002",
+    "element_id": 1002,
+    "sheet_number": "A101",
+    "view_name": "Level 1",
+    "text": "Install fire-rated door (60 min) and seal gaps.\nCoordinate with MEP."
+  },
+  {
+    "unique_id": "demo-003",
+    "element_id": 1003,
+    "sheet_number": "A501",
+    "view_name": "Details",
+    "text": "See detail 3/A501 for connection."
+  },
+  {
+    "unique_id": "demo-004",
+    "element_id": 1004,
+    "sheet_number": "A101",
+    "view_name": "Level 1",
+    "text": "LEVEL 1 FLOOR PLAN"
+  },
+  {
+    "unique_id": "demo-005",
+    "element_id": 1005,
+    "sheet_number": "A101",
+    "view_name": "Level 1",
+    "text": "1'-6\\\""
+  },
+  {
+    "unique_id": "demo-006",
+    "element_id": 1006,
+    "sheet_number": "A102",
+    "view_name": "Level 2",
+    "text": "Existing wall to remain."
+  },
+  {
+    "unique_id": "demo-007",
+    "element_id": 1007,
+    "sheet_number": "A102",
+    "view_name": "Level 2",
+    "text": "Install anchors as required."
+  },
+  {
+    "unique_id": "demo-008",
+    "element_id": 1008,
+    "sheet_number": "A102",
+    "view_name": "Level 2",
+    "text": "Architect to provide final colour. Paint walls."
+  },
+  {
+    "unique_id": "demo-009",
+    "element_id": 1009,
+    "sheet_number": "A102",
+    "view_name": "Level 2",
+    "text": "TBC"
+  },
+  {
+    "unique_id": "demo-010",
+    "element_id": 1010,
+    "sheet_number": "A103",
+    "view_name": "Level 3",
+    "text": "Door type to be confirmed on site."
+  },
+  {
+    "unique_id": "demo-011",
+    "element_id": 1011,
+    "sheet_number": "A103",
+    "view_name": "Level 3",
+    "text": "Walls are fire-rated and the door is 2 hr rated."
+  },
+  {
+    "unique_id": "demo-012",
+    "element_id": 1012,
+    "sheet_number": "A103",
+    "view_name": "Level 3",
+    "text": "Existing partition is to be removed."
+  }
+]
