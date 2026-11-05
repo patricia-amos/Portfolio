@@ -1,0 +1,175 @@
+{
+  "model": "llama3.1:8b",
+  "ollama_url": "http://localhost:11434",
+  "temperature": 0,
+  "seed": 42,
+  "timeout": 120,
+  "task": "You edit text notes taken from architectural construction drawings. Rewrite each note by applying ONLY the rules below. Keep the meaning, wording and word order identical except where a rule requires a change. The drawings describe a building that is ALREADY BUILT (as-built), so nothing is pending any more. Apply the rules in the order listed.",
+  "rules": [
+    {
+      "id": "remove_as_required",
+      "enabled": true,
+      "instruction": "Delete filler phrases such as 'as required', 'as needed', 'as necessary', 'as directed', 'as applicable', 'where required', 'if required', 'if necessary'. Remove only the phrase and tidy the punctuation around it. Keep the rest of the sentence."
+    },
+    {
+      "id": "remove_pending_input",
+      "enabled": true,
+      "instruction": "The building is already built, so delete any phrase or sentence saying that something still has to be confirmed, verified, provided, coordinated, approved or decided by a party or on site. Examples: 'to be confirmed', 'TBC', 'TBD', 'to be verified on site', 'verify in field', 'field verify', 'contractor to verify', 'architect to provide', 'engineer to confirm', 'confirm with the consultant', 'by others to confirm', 'subject to approval', 'coordinate with ...'. Remove only that phrase or sentence and keep everything else grammatical. If nothing meaningful is left after removal, return an empty string. Never delete product names, materials, locations, headings, labels or other descriptive content, even when it comes before a dash. Only the pending-input phrase itself may be deleted."
+    },
+    {
+      "id": "past_tense",
+      "enabled": true,
+      "instruction": "Change every verb to simple past tense, including irregular verbs and the verbs to be, to have and to do: 'is'/'am' -> 'was', 'are' -> 'were', 'has'/'have' -> 'had', 'does'/'do' -> 'did', 'will' -> 'would', 'can' -> 'could', 'Install' -> 'Installed', 'to verify' -> 'verified'. 'is to be'/'will be'/'to be' + past participle becomes 'was'/'were' + past participle (e.g. 'is to be removed' -> 'was removed'). Leave 'shall', 'must' and 'should' unchanged. Use 'were' for plural subjects and 'was' for singular subjects."
+    },
+    {
+      "id": "keep_references",
+      "enabled": true,
+      "instruction": "Leave cross-references and drawing instructions unchanged (e.g. 'See detail 3/A501', 'Refer to', 'Typ.', 'N.T.S.')."
+    },
+    {
+      "id": "us_spelling",
+      "enabled": false,
+      "instruction": "Use US spelling (e.g. 'colour' -> 'color')."
+    },
+    {
+      "id": "sentence_case",
+      "enabled": false,
+      "instruction": "Convert ALL CAPS sentences to sentence case, but keep acronyms in capitals."
+    },
+    {
+      "id": "double_spaces",
+      "enabled": false,
+      "instruction": "Replace double spaces with a single space."
+    }
+  ],
+  "never_change": [
+    "Numbers, dimensions, units, grid and room numbers",
+    "Tags, product names, material codes and abbreviations/acronyms",
+    "Line breaks (keep the same number of lines)",
+    "Anything not covered by the rules above",
+    "Capitalisation of words you do not change (keep Title Case exactly as written)",
+    "Descriptive content: product names, materials, locations, headings and labels"
+  ],
+  "examples": [
+    {
+      "input": "Countertop w Backsplash - Provide Blocking in Walls as Required",
+      "output": "Countertop w Backsplash - Provided Blocking in Walls"
+    },
+    {
+      "input": "Install anchors as required.",
+      "output": "Installed anchors."
+    },
+    {
+      "input": "Contractor to verify dimensions on site.",
+      "output": ""
+    },
+    {
+      "input": "Architect to provide final colour. Paint walls.",
+      "output": "Painted walls."
+    },
+    {
+      "input": "Provide 2 hr rated assembly, engineer to confirm rating.",
+      "output": "Provided 2 hr rated assembly."
+    },
+    {
+      "input": "Door type TBC on site.",
+      "output": ""
+    },
+    {
+      "input": "Install fire-rated door and seal all gaps around frame.",
+      "output": "Installed fire-rated door and sealed all gaps around frame."
+    },
+    {
+      "input": "See detail 3/A501 for connection.",
+      "output": "See detail 3/A501 for connection."
+    },
+    {
+      "input": "Walls are 2 hr rated and the door is fire-rated.",
+      "output": "Walls were 2 hr rated and the door was fire-rated."
+    },
+    {
+      "input": "Existing partition is to be removed.",
+      "output": "Existing partition was removed."
+    },
+    {
+      "input": "Door has a closer and will be painted.",
+      "output": "Door had a closer and was painted."
+    }
+  ],
+  "protected_patterns": [
+    "\\b\\w*\\d\\w*\\b",
+    "\\b[A-Z]{2,}\\b"
+  ],
+  "validation": {
+    "max_changed_word_ratio": 0.8,
+    "min_length_ratio": 0.15,
+    "max_length_ratio": 1.6,
+    "min_words_for_change_check": 8
+  },
+  "selection": {
+    "enabled": true,
+    "min_words": 2,
+    "max_chars": 1500,
+    "sheet_include": [],
+    "sheet_exclude": [],
+    "skip_patterns": [
+      {
+        "id": "short_caps_title_or_tag",
+        "pattern": "^[^a-z]{1,40}$"
+      },
+      {
+        "id": "reference_only",
+        "pattern": "^(see|refer to)\\b[^.\\n]*\\.?$",
+        "flags": "i"
+      },
+      {
+        "id": "dimension_or_number_only",
+        "pattern": "^[\\d\\s.,'\"/xX\\-]+$"
+      }
+    ],
+    "require_any": [
+      {
+        "id": "action_verb",
+        "pattern": "\\b(install|verify|provide|coordinate|confirm|check|ensure|remove|replace|repair|patch|paint|seal|fasten|anchor|relocate|demolish|protect|maintain|connect|apply|finish|cut|drill|locate|align|secure|review|submit|obtain|notify|match|extend|terminate|field)(s)?\\b",
+        "flags": "i"
+      },
+      {
+        "id": "be_have_do_forms",
+        "flags": "i",
+        "pattern": "\\b(is|are|am|has|have|does|do|will|can)\\b"
+      }
+    ],
+    "always_select": [
+      {
+        "id": "as_required_phrases",
+        "flags": "i",
+        "pattern": "\\bas (required|needed|necessary|directed|applicable)\\b|\\b(where|if) (required|necessary|applicable)\\b"
+      },
+      {
+        "id": "pending_input_phrases",
+        "flags": "i",
+        "pattern": "\\b(tbc|tbd|tba)\\b|\\bto be (confirmed|verified|determined|provided|coordinated|advised|approved)\\b|\\b(contractor|architect|engineer|consultant|owner|client|designer|supplier|manufacturer)\\b[^.\\n]{0,40}\\bto (verify|confirm|provide|coordinate|advise|determine|approve|review|submit|specify|select)\\b|\\b(verify|confirm|coordinate)\\b[^.\\n]{0,20}\\b(on[- ]site|in field|with)\\b|\\bfield verify\\b|\\bsubject to\\b"
+      }
+    ]
+  },
+  "allow_removed_tokens": [
+    "TBC",
+    "TBD",
+    "TBA"
+  ],
+  "preserve_case": true,
+  "check_removals": true,
+  "forced_replacements": {
+    "enabled": true,
+    "map": {
+      "is": "was",
+      "are": "were",
+      "am": "was",
+      "has": "had",
+      "have": "had",
+      "does": "did",
+      "will": "would",
+      "can": "could"
+    }
+  }
+}
