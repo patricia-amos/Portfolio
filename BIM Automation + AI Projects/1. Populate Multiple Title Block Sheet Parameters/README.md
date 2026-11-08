@@ -1,6 +1,6 @@
 # Populate Multiple Sheet Parameters
 
-Revit sheet parameter automation through Dynamo. For application of one or more same value sheet parameters to multiple sheets. 
+Revit sheet batch parameter automation through Dynamo. For application of one or more same value sheet parameters to multiple sheets. 
 
 ## The Problem
 
@@ -8,7 +8,7 @@ Revit sheets contain multiple parameters whose values frequently change througho
 
 ## What It Does
 
-Sheets are grouped through a filter parameter value. Dynamo player would require a filter parameter name and value input to specify sheets for application. Upon running the script, dynamo prompts an input window wherein the users can add one or more parameter names and values. These values will be applied and reflected on the output portion of the dynamo player. Output will show 2 sections. First section is an errors or missing parameters section which shows the sheet number, title of sheets,  and the specified parameter that doesn't exist. Second section is a successful parameter replacement section which shows the sheet number and title of succssful replacements. 
+Sheets are grouped through a filter grouping parameter value. Dynamo player would require a filter parameter name and value input to specify sheets for application. Upon running the script, dynamo prompts an input window wherein the users can add one or more parameter names and values. These values will be applied and reflected on the and output window. Output will show 2 sections, an errors or missing parameters section and a successful parameter replacement section. 
 
 ## Tools 
 
@@ -19,7 +19,7 @@ Sheets are grouped through a filter parameter value. Dynamo player would require
 ## How It Works
 
 ```
-User inputs sheet group parameter name and value  
+User inputs sheet filter grouping parameter name and value  
                             |
                             v
 Dynamo filters sheet based on input parameter name and value 
