@@ -2,21 +2,21 @@
 
 Revit sheet parameter automation through Dynamo. For application of one or more same value sheet parameters to multiple sheets. 
 
-## The Problem
+## 🏢The Problem
 
 Revit sheets contain multiple parameters whose values frequently change throughout a project's duration. In practice, managing these changes typically relies on two manual methods: generating a sheet list schedule to input values cell-by-cell, or selecting individual sheets to update their properties via the Properties palette. Both approaches are incredibly tedious and time-consuming, scaling poorly when dealing with dozens or hundreds of sheets across a large-scale project. 
 
-## What It Does
+## 💻What It Does
 
 Sheets are grouped through a filter parameter value. Dynamo player would require a filter parameter name and value input to specify sheets for application. Upon running the script, dynamo prompts an input window wherein the users can add one or more parameter names and values. These values will be applied and reflected on the output portion of the dynamo player. Output will show 2 sections. First section is an errors or missing parameters section which shows the sheet number, title of sheets,  and the specified parameter that doesn't exist. Second section is a successful parameter replacement section which shows the sheet number and title of succssful replacements. 
 
-## Tools 
+## 🛠️Tools 
 
 - Autodesk Revit 2025 Architectural Sample Model --  BIM model and source data 
 - Dynamo v.3.3.0 -- Automated Revit data extraction
 - Python -- Revit API-based element collection and geometry filtering
 
-## How It Works
+## 🔧How It Works
 
 ```
 User inputs sheet group parameter name and value  
@@ -40,7 +40,7 @@ Python script writes each parameter values to each sheet
 Python script generate report window showing errors in red and successes in green
 ```
 
-## Dynamo Graph
+## 📊Dynamo Graph
 
 ![Dynamo Graph for PopulateMultipleTitleBlockSheetParameters](images/PopulateMultipleSheetParameters_Dynamo%20Script.png)
 [View PopulateMultipleTitleBlockSheetParameters dynamo script](dynamo/PopulateMultipleSheetParameters.dyn)  
@@ -51,7 +51,7 @@ Dynamo script walkthrough
 2. Filters sheets through a filter parameter name and value with Element.GetParameterValueByName, ==, and List.FilterByBoolMask 
 3. Filtered sheets are connected to a SetSheetParameters Python Script which display input window, replaces parameter values, and generates report window 
 
-## SetSheetParameters.py Deep Dive
+## 📄SetSheetParameters.py Deep Dive
 
 A Dynamo Python node that writes parameter values onto a list of Revit sheets. You wire in the sheets, type the parameter names and values into a small window, and the script applies them to every sheet, then shows a report of what worked and what failed.
 
@@ -236,5 +236,5 @@ OUT = {
 The dictionary goes back to Dynamo for a Watch node. Other possible outputs are plain text messages: `Error: ...`, `Operation cancelled by user.` and `Global Script Error: ...`.
 
 
-## License 
+## ©️License 
 MIT. See [LICENSE](../LICENSE)
