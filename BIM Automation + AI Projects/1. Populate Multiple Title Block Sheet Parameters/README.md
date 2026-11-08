@@ -18,27 +18,27 @@ Sheets are grouped through a filter grouping parameter value. Dynamo player woul
 
 ## 🔧How It Works
 
-```
-User inputs sheet filter grouping parameter name and value  
-                            |
-                            v
-Dynamo filters sheet based on input parameter name and value 
-                            |
-                            v
-Dynamo collects all sheet elements from selected sheets
-                            |
-                            v
-Python script displays input window 
-                            |
-                            v
-User adds one or more input parameter names and values
-                            |
-                            v
-Python script writes each parameter values to each sheet 
-                            |
-                            v
-Python script generate report window showing errors in red and successes in green
-```
+
+1. User inputs sheet filter grouping parameter name and value  
+![Dynamo Player](images/PopulateMultipleSheetParameters_Flow1.png)
+2. Dynamo filters sheet based on input parameter name and value 
+
+3. Dynamo collects all sheet elements from selected sheets
+
+4. Python script displays input window 
+
+![Dynamo Player](images/PopulateMultipleSheetParameters_Flow2.png)
+
+5. User adds one or more input parameter names and values
+
+6. Python script writes each parameter values to each sheet 
+
+7. Python script generate report window showing errors in red and successes in green
+![Output Report](images/PopulateMultipleSheetParameters_Flow3.png)
+![Output Report 2](images/PopulateMultipleSheetParameters_Flow4.png)
+
+Demo
+![Script Demo](images/PopulateMultipleSheetParameters_Demo.gif)
 
 ## 📊Dynamo Graph
 
@@ -79,7 +79,7 @@ flowchart TD
     P4 -->|Apply| P5["Part 5: Write to Revit (one transaction)"]
     P4 -->|window closed| X2["OUT = cancelled message"]
     P5 -.->|uses| H["set_param_value(): text to Revit type"]
-    P5 -->|missing or read-only parameter| E["Error log"]
+    P5 -->|missing/read-only parameter| E["Error log"]
     P5 --> P6["Part 6: Report window, then OUT dictionary"]
     E --> P6
 ```
@@ -234,6 +234,13 @@ OUT = {
 ```
 
 The dictionary goes back to Dynamo for a Watch node. Other possible outputs are plain text messages: `Error: ...`, `Operation cancelled by user.` and `Global Script Error: ...`.
+
+## ⚠️ Things to know
+
+- **Blank value clears the parameter.** The default `Drawn By` row has an empty value, so clicking Apply immediately sets that parameter to an empty string on every selected sheet.
+- **Number units.** Double parameters are written in Revit's internal units, so lengths are in feet. There is no unit conversion.
+- **Partly failed sheets appear in both lists.** A sheet counts as updated if at least one parameter was written, even if another parameter on it failed.
+- **The total counts sheets, not parameters.** Three parameters on ten sheets still reads "Total Sheets Successfully Updated: 10".
 
 
 ## ©️License 
