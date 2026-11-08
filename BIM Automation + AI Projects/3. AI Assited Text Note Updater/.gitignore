@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.pyc
+
+# files created while the tool runs (they can contain real project text)
+results.json
+approved.json
+review_decisions.csv
+pending_report_rows.json
+*.tmp
+
+# Excel: ignore real reports and lock files, keep the sample
+*.xlsx
+~$*.xlsx
+!samples/*.xlsx
+
+# Revit models and families
+*.rvt
+*.rfa
+*.rte
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
