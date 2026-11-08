@@ -55,9 +55,9 @@ Dynamo script walkthrough
 
 A Dynamo Python node that writes parameter values onto a list of Revit sheets. You wire in the sheets, type the parameter names and values into a small window, and the script applies them to every sheet, then shows a report of what worked and what failed.
 
-[View PopulateMultipleTitleBlockSheetParameters dynamo script](dynamo/SetSheetParameters.py) 
+[View SetSheetParameters python script](dynamo/SetSheetParameters.py) 
 
-## 🧭 Overview
+🧭 <u>__Overview__</u>
 
 | | |
 |---|---|
@@ -69,7 +69,7 @@ A Dynamo Python node that writes parameter values onto a list of Revit sheets. Y
 
 **Requirements:**Python node engine set to **CPython3** (the script uses f-strings), and Windows (the windows are built with WPF). Set Dynamo's run mode to **Manual**, otherwise any upstream change reopens the window.
 
-## 🔗 How it flows
+🔗 <u>__How it flows__</u>
 
 ```mermaid
 flowchart TD
@@ -86,7 +86,7 @@ flowchart TD
 
 The whole script is wrapped in a `try/except`, so any unexpected error returns `Global Script Error: ...` in `OUT` instead of a red node. The Revit transaction is closed in a `try/finally` (see Part 5), so it is always closed, even in that case.
 
-## 1️⃣ Part 1: Imports and setup
+1️⃣ <u>__Part 1: Imports and setup__</u>
 
 ```python
 clr.AddReference('PresentationFramework')
@@ -105,7 +105,7 @@ raw_input = IN[0]
 
 `clr.AddReference` loads .NET libraries. The first three are **WPF**, the Windows toolkit used to draw the windows, buttons and text boxes in code. `DocumentManager` gives the open Revit document (`doc`), and `TransactionManager` lets the script edit it safely. `raw_input` is whatever is wired into the node.
 
-## 2️⃣ Part 2: Helper function `set_param_value()`
+2️⃣ <u>__Part 2: Helper function `set_param_value()`__</u>
 
 ```python
 def set_param_value(param, val_str):
@@ -133,7 +133,7 @@ Revit parameters have a fixed storage type, but the window only gives text. This
 
 It returns whether `param.Set(...)` succeeded.
 
-## 3️⃣ Part 3: Check and unwrap the input
+3️⃣ <u>__Part 3: Check and unwrap the input__</u>
 
 ```python
 wrapped_sheets = raw_input if isinstance(raw_input, list) else [raw_input]
@@ -148,7 +148,7 @@ for s in wrapped_sheets:
 
 The script makes sure it always has a list, drops nulls, and stops with a message if the input is `None` or has no valid sheets. Dynamo wraps Revit elements in its own objects, so `InternalElement` is used to get the underlying Revit sheet that has `SheetNumber` and `LookupParameter`.
 
-## 4️⃣ Part 4: The input window
+4️⃣ <u>__Part 4: The input window__</u>
 
 ```python
 def add_parameter_row(default_name="", default_val=""):
@@ -176,7 +176,7 @@ if win.ShowDialog() == True:
 
 `ShowDialog()` pauses Dynamo until the window closes. Clicking **Apply** sets `DialogResult = True`; closing the window any other way ends with `Operation cancelled by user.` Rows with a blank name are skipped.
 
-## 5️⃣ Part 5: Writing to Revit
+ 5️⃣ <u>__Part 5: Writing to Revit__</u>
 
 ```python
 TransactionManager.Instance.EnsureInTransaction(doc)
@@ -211,7 +211,8 @@ Three collections record the outcome:
 - `successful_sheets`: a set of labels such as `A101 - Floor Plan`
 - `successful_params`: a set of parameter names that were written
 
-## 6️⃣ Part 6: Report window and output
+
+6️⃣ <u>__Part 6: Report window and output__<u>
 
 ```python
 parts = err.split(f"'{p_name}'")
