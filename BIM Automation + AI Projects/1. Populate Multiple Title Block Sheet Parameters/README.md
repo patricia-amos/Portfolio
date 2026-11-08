@@ -2,21 +2,21 @@
 
 Revit sheet batch parameter automation through Dynamo. For application of one or more same value sheet parameters to multiple sheets. 
 
-## The Problem
+## 🏢The Problem
 
 Revit sheets contain multiple parameters whose values frequently change throughout a project's duration. In practice, managing these changes typically relies on two manual methods: generating a sheet list schedule to input values cell-by-cell, or selecting individual sheets to update their properties via the Properties palette. Both approaches are incredibly tedious and time-consuming, scaling poorly when dealing with dozens or hundreds of sheets across a large-scale project. 
 
-## What It Does
+## 💻What It Does
 
 Sheets are grouped through a filter grouping parameter value. Dynamo player would require a filter parameter name and value input to specify sheets for application. Upon running the script, dynamo prompts an input window wherein the users can add one or more parameter names and values. These values will be applied and reflected on the and output window. Output will show 2 sections, an errors or missing parameters section and a successful parameter replacement section. 
 
-## Tools 
+## 🛠️Tools 
 
 - Autodesk Revit 2025 Architectural Sample Model --  BIM model and source data 
 - Dynamo v.3.3.0 -- Automated Revit data extraction
 - Python -- Revit API-based element collection and geometry filtering
 
-## How It Works
+## 🔧How It Works
 
 ```
 User inputs sheet filter grouping parameter name and value  
@@ -40,7 +40,7 @@ Python script writes each parameter values to each sheet
 Python script generate report window showing errors in red and successes in green
 ```
 
-## Dynamo Graph
+## 📊Dynamo Graph
 
 ![Dynamo Graph for PopulateMultipleTitleBlockSheetParameters](images/PopulateMultipleSheetParameters_Dynamo%20Script.png)
 [View PopulateMultipleTitleBlockSheetParameters dynamo script](dynamo/PopulateMultipleSheetParameters.dyn)  
@@ -51,13 +51,13 @@ Dynamo script walkthrough
 2. Filters sheets through a filter parameter name and value with Element.GetParameterValueByName, ==, and List.FilterByBoolMask 
 3. Filtered sheets are connected to a SetSheetParameters Python Script which display input window, replaces parameter values, and generates report window 
 
-## SetSheetParameters.py Deep Dive
+## 📄SetSheetParameters.py Deep Dive
 
 A Dynamo Python node that writes parameter values onto a list of Revit sheets. You wire in the sheets, type the parameter names and values into a small window, and the script applies them to every sheet, then shows a report of what worked and what failed.
 
 [View SetSheetParameters python script](dynamo/SetSheetParameters.py) 
 
-🧭 <u>__Overview__</u>
+🧭 <ins>__Overview__</ins>
 
 | | |
 |---|---|
@@ -69,7 +69,7 @@ A Dynamo Python node that writes parameter values onto a list of Revit sheets. Y
 
 **Requirements:**Python node engine set to **CPython3** (the script uses f-strings), and Windows (the windows are built with WPF). Set Dynamo's run mode to **Manual**, otherwise any upstream change reopens the window.
 
-🔗 <u>__How it flows__</u>
+🔗 <ins>__How it flows__</ins>
 
 ```mermaid
 flowchart TD
@@ -86,7 +86,7 @@ flowchart TD
 
 The whole script is wrapped in a `try/except`, so any unexpected error returns `Global Script Error: ...` in `OUT` instead of a red node. The Revit transaction is closed in a `try/finally` (see Part 5), so it is always closed, even in that case.
 
-1️⃣ <u>__Part 1: Imports and setup__</u>
+1️⃣ <ins>__Part 1: Imports and setup__</ins>
 
 ```python
 clr.AddReference('PresentationFramework')
@@ -105,7 +105,7 @@ raw_input = IN[0]
 
 `clr.AddReference` loads .NET libraries. The first three are **WPF**, the Windows toolkit used to draw the windows, buttons and text boxes in code. `DocumentManager` gives the open Revit document (`doc`), and `TransactionManager` lets the script edit it safely. `raw_input` is whatever is wired into the node.
 
-2️⃣ <u>__Part 2: Helper function `set_param_value()`__</u>
+2️⃣ <ins>__Part 2: Helper function `set_param_value()`__</ins>
 
 ```python
 def set_param_value(param, val_str):
@@ -133,7 +133,7 @@ Revit parameters have a fixed storage type, but the window only gives text. This
 
 It returns whether `param.Set(...)` succeeded.
 
-3️⃣ <u>__Part 3: Check and unwrap the input__</u>
+3️⃣ <ins>__Part 3: Check and unwrap the input__</ins>
 
 ```python
 wrapped_sheets = raw_input if isinstance(raw_input, list) else [raw_input]
@@ -148,7 +148,7 @@ for s in wrapped_sheets:
 
 The script makes sure it always has a list, drops nulls, and stops with a message if the input is `None` or has no valid sheets. Dynamo wraps Revit elements in its own objects, so `InternalElement` is used to get the underlying Revit sheet that has `SheetNumber` and `LookupParameter`.
 
-4️⃣ <u>__Part 4: The input window__</u>
+4️⃣ <ins>__Part 4: The input window__</ins>
 
 ```python
 def add_parameter_row(default_name="", default_val=""):
@@ -176,7 +176,7 @@ if win.ShowDialog() == True:
 
 `ShowDialog()` pauses Dynamo until the window closes. Clicking **Apply** sets `DialogResult = True`; closing the window any other way ends with `Operation cancelled by user.` Rows with a blank name are skipped.
 
- 5️⃣ <u>__Part 5: Writing to Revit__</u>
+ 5️⃣ <ins>__Part 5: Writing to Revit__</ins>
 
 ```python
 TransactionManager.Instance.EnsureInTransaction(doc)
@@ -212,7 +212,7 @@ Three collections record the outcome:
 - `successful_params`: a set of parameter names that were written
 
 
-6️⃣ <u>__Part 6: Report window and output__<u>
+6️⃣ <ins>__Part 6: Report window and output__</ins>
 
 ```python
 parts = err.split(f"'{p_name}'")
@@ -236,5 +236,5 @@ OUT = {
 The dictionary goes back to Dynamo for a Watch node. Other possible outputs are plain text messages: `Error: ...`, `Operation cancelled by user.` and `Global Script Error: ...`.
 
 
-## License 
+## ©️License 
 MIT. See [LICENSE](../LICENSE)
