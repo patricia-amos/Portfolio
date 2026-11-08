@@ -1,19 +1,10 @@
 Intro 
 
 
-Dynamo 1 Title: 
-
-Use: 
-
-
-Image of script
-
-
-Workflow:
-
-
-GIF file of use: 
-
+Script Objectives:
+    1. To demonstrate 
+    2. To automate 
+    3. To 
  
 
 

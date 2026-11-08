@@ -2,124 +2,238 @@
 
 Revit sheet parameter automation through Dynamo. For application of one or more same value sheet parameters to multiple sheets. 
 
-## The problem
+## The Problem
 
 Revit sheets contain multiple parameters whose values frequently change throughout a project's duration. In practice, managing these changes typically relies on two manual methods: generating a sheet list schedule to input values cell-by-cell, or selecting individual sheets to update their properties via the Properties palette. Both approaches are incredibly tedious and time-consuming, scaling poorly when dealing with dozens or hundreds of sheets across a large-scale project. 
 
-## What it does
+## What It Does
 
-Sheets are grouped through a filter parameter. Dynamo player would require a filter parameter name and value to only apply on selected sheets. Upon running the script, dynamo prompts an interactive UI wherein the users can add one or more parameter and input parameter names and values. These values will be applied and reflected on the output portion of the dynamo player. Output will show 2 sections. First section is an errors or missing parameters section which shows the sheet number, title of sheets,  and the specified parameter that doesn't exist. Second section is a successful parameter replacement section which shows the sheet number and title of succssful replacements. 
+Sheets are grouped through a filter parameter value. Dynamo player would require a filter parameter name and value input to specify sheets for application. Upon running the script, dynamo prompts an input window wherein the users can add one or more parameter names and values. These values will be applied and reflected on the output portion of the dynamo player. Output will show 2 sections. First section is an errors or missing parameters section which shows the sheet number, title of sheets,  and the specified parameter that doesn't exist. Second section is a successful parameter replacement section which shows the sheet number and title of succssful replacements. 
 
+## Tools 
 
-## How it works
+- Autodesk Revit 2025 Architectural Sample Model --  BIM model and source data 
+- Dynamo v.3.3.0 -- Automated Revit data extraction
+- Python -- Revit API-based element collection and geometry filtering
 
-```
-Dynamo selection of sheets -> collect all sheet elements of grouped sheet filtered based on parameter name and value
-                                          |
-UI parameter replacement python script -> local model rewrites line by line
-                                  
-
+## How It Works
 
 ```
-
-1. **Select.** Rules decide which notes and lines are applicable (skip titles, dimensions and cross-references; require an action verb, a form of is/are/have/do, or a removal phrase). Skipped notes keep a reason.
-2. **Rewrite.** Each line goes to a local [Ollama](https://ollama.com) model with temperature 0 and a fixed seed, using the rules in `tool/rules.json`.
-3. **Guard.** The model's answer is never trusted blindly:
-   - an answer unrelated to the original (for example a copied example) is rejected;
-   - text deleted by the model that is not a removal phrase is put back;
-   - Title Case and line breaks are restored;
-   - `is`/`are`/`has`... are converted by a configurable word map as a safety net;
-   - numbers, tags and acronyms are checked before and after; doubtful notes are flagged.
-4. **Review.** A page on `127.0.0.1` shows old and new text with a colour-coded diff (yellow = reworded, red strikethrough = removed). Approve, reject or edit each note.
-5. **Write back.** Dynamo replaces the text of approved notes and deletes notes whose words were all removed. A note edited in Revit since extraction is skipped.
-6. **Report.** Changed notes are logged to `Text_notes_update_report.xlsx` (sheet number, Element ID, original text, new text, date of update). One row per Element ID: an existing row is replaced, a new ID is added at the bottom, and the file is updated in place.
-
-## Requirements
-
-- Revit 2025 with Dynamo (Python nodes set to the **CPython3** engine)
-- [Ollama](https://ollama.com) running locally with a model pulled (default `llama3.1:8b`, set in `tool/rules.json`); developed with Ollama 0.40.2
-- No pip packages. All Python uses the standard library, so it runs inside Dynamo's own Python. Python 3.9+ is only needed to run the command-line demo and the tests.
-
-## Try it without Revit
-
-```bash
-git clone https://github.com/<you>/revit-textnote-asbuilt-cleanup.git
-cd revit-textnote-asbuilt-cleanup
-
-# 1. which sample notes would be sent to the model? (no model needed)
-python tool/ollama_client.py samples/sample_notes.json --dry-run
-
-# 2. rewrite them (needs Ollama running and: ollama pull llama3.1:8b)
-python tool/ollama_client.py samples/sample_notes.json
-
-# 3. open the review page, then click "Save & finish"
-python tool/review_ui.py samples/results.json
+User inputs sheet group parameter name and value  
+                            |
+                            v
+Dynamo filters sheet based on input parameter name and value 
+                            |
+                            v
+Dynamo collects all sheet elements from selected sheets
+                            |
+                            v
+Python script displays input window 
+                            |
+                            v
+User adds one or more input parameter names and values
+                            |
+                            v
+Python script writes each parameter values to each sheet 
+                            |
+                            v
+Python script generate report window showing errors in red and successes in green
 ```
 
-On Windows use `py` instead of `python`. Output files (`results.json`, `approved.json`, `review_decisions.csv`) appear next to the sample file and are git-ignored.
+## Dynamo Graph
 
-## Use it in Dynamo
+![Dynamo Graph for PopulateMultipleTitleBlockSheetParameters](images/PopulateMultipleSheetParameters_Dynamo%20Script.png)
+[View PopulateMultipleTitleBlockSheetParameters dynamo script](dynamo/PopulateMultipleSheetParameters.dyn)  
 
-Put the four files in `tool/` into one folder, then paste each file from `dynamo/` into a Python Script node (CPython3). Full wiring is in [`dynamo/README.md`](dynamo/README.md). In short:
+Dynamo script walkthrough 
 
-| Node | Inputs | Output |
-|---|---|---|
-| 1 `node1_ask_ollama.py` | scripts folder, unique IDs, element IDs, sheet numbers, texts, report folder | path to `results.json` |
-| 2 `node2_review.py` | output of node 1 | path to `approved.json` (after you click Save & finish) |
-| 3 `node3_write_back.py` | output of node 2, Boolean (False = dry run, True = apply) | log lines for a Watch node |
+1. Selects all sheet elements through Categories and All Elements of Category nodes
+2. Filters sheets through a filter parameter name and value with Element.GetParameterValueByName, ==, and List.FilterByBoolMask 
+3. Filtered sheets are connected to a SetSheetParameters Python Script which display input window, replaces parameter values, and generates report window 
 
-**Always run Node 3 as a dry run first (Boolean False), and test on a copy of the model.**
+## SetSheetParameters.py Deep Dive
 
-## Configuration (`tool/rules.json`)
+A Dynamo Python node that writes parameter values onto a list of Revit sheets. You wire in the sheets, type the parameter names and values into a small window, and the script applies them to every sheet, then shows a report of what worked and what failed.
 
-| Key | What it controls |
+[View PopulateMultipleTitleBlockSheetParameters dynamo script](dynamo/SetSheetParameters.py) 
+
+## 🧭 Overview
+
+| | |
 |---|---|
-| `model`, `ollama_url`, `temperature`, `seed` | which local model is used and how repeatable it is |
-| `rules` | language rules in plain English, each with `enabled` (as required, pending input, past tense, ...) |
-| `examples` | worked examples, sent to the model as earlier chat turns |
-| `selection` | which notes are applicable: sheet include/exclude, skip patterns, required triggers, always-select removal phrases |
-| `forced_replacements` | word map applied after the model (is to was, are to were, ...) |
-| `protected_patterns`, `validation` | what must not change, and the limits that raise a flag |
-| `preserve_case`, `check_removals` | the capitalisation and removal guards |
+| **Input** | `IN[0]`: a list of sheets (Dynamo sheet objects or Revit elements) |
+| **User input** | A pop-up window with editable *Parameter Name / Value to Set* rows |
+| **Action** | Writes each value to each sheet inside one Revit transaction |
+| **Feedback** | A pop-up report window listing errors and updated sheets |
+| **Output** | `OUT`: a dictionary of counts and lists (or a text message) |
 
-## Safety
+**Requirements:**Python node engine set to **CPython3** (the script uses f-strings), and Windows (the windows are built with WPF). Set Dynamo's run mode to **Manual**, otherwise any upstream change reopens the window.
 
-- Runs locally; no project text is sent anywhere.
-- A person approves every change; nothing is written without approval.
-- Dry-run mode, edit protection (notes changed since extraction are skipped), and a flag on every doubtful suggestion.
-- The write-back reports a per-note result and continues if one note fails (for example, owned by another user in a workshared model).
-- If the Excel file is open, rows wait in `pending_report_rows.json` and are added on the next run.
+## 🔗 How it flows
 
-## Limitations
-
-- Setting a note's text removes formatting inside that note (bold, underline, bullets). Test on a formatted note first.
-- The selection trigger list is a heuristic. A verb that is not on it is skipped, so check the *Skipped* filter on a first run.
-- Output quality depends on the local model. The guards make bad answers harmless, but cannot make a weak model good.
-- Dynamo stays busy while the review page is open.
-- A replaced report row keeps only the latest change for that element.
-
-## Tests
-
-```bash
-python -m unittest discover -s tests -v
+```mermaid
+flowchart TD
+    S["Parts 1-2: Setup and helper function"] --> P3
+    P3["Part 3: Check IN[0], unwrap sheets"] -->|valid| P4["Part 4: Input window"]
+    P3 -->|empty or None| X1["OUT = error text"]
+    P4 -->|Apply| P5["Part 5: Write to Revit (one transaction)"]
+    P4 -->|window closed| X2["OUT = cancelled message"]
+    P5 -.->|uses| H["set_param_value(): text to Revit type"]
+    P5 -->|missing or read-only parameter| E["Error log"]
+    P5 --> P6["Part 6: Report window, then OUT dictionary"]
+    E --> P6
 ```
 
-51 tests run without Revit or Ollama: selection and validation rules, the guards, the full pipeline against a fake Ollama server, the review export, the Excel report (create, replace by Element ID, locked file, a file re-saved by Excel), and `node3_write_back.py` against a fake Revit document. One test is skipped automatically if `openpyxl` is not installed.
+The whole script is wrapped in a `try/except`, so any unexpected error returns `Global Script Error: ...` in `OUT` instead of a red node. The Revit transaction is closed in a `try/finally` (see Part 5), so it is always closed, even in that case.
 
-## Repository layout
+## 1️⃣ Part 1: Imports and setup
 
+```python
+clr.AddReference('PresentationFramework')
+clr.AddReference('PresentationCore')
+clr.AddReference('WindowsBase')
+from System.Windows import Window, Thickness, ...
+from System.Windows.Controls import Button, StackPanel, Grid, TextBox, ...
+
+from RevitServices.Persistence import DocumentManager
+from RevitServices.Transactions import TransactionManager
+from Autodesk.Revit.DB import StorageType, ElementId
+
+doc = DocumentManager.Instance.CurrentDBDocument
+raw_input = IN[0]
 ```
-tool/       ollama_client.py, review_ui.py, report_xlsx.py, rules.json   (keep together)
-dynamo/     one script per Dynamo Python node + wiring guide
-samples/    sample_notes.json, sample_report.xlsx
-tests/      unit and integration tests with simulated Revit and Ollama
-docs/       write-ups and screenshots (docs/images)
+
+`clr.AddReference` loads .NET libraries. The first three are **WPF**, the Windows toolkit used to draw the windows, buttons and text boxes in code. `DocumentManager` gives the open Revit document (`doc`), and `TransactionManager` lets the script edit it safely. `raw_input` is whatever is wired into the node.
+
+## 2️⃣ Part 2: Helper function `set_param_value()`
+
+```python
+def set_param_value(param, val_str):
+    st = param.StorageType
+    if st == StorageType.String:
+        return param.Set(str(val_str))
+    elif st == StorageType.Integer:
+        v_clean = str(val_str).strip().lower()
+        if v_clean in ['true', 'yes', '1']:
+            return param.Set(1)
+        elif v_clean in ['false', 'no', '0']:
+            return param.Set(0)
+        return param.Set(int(v_clean))
+    ...
 ```
 
-## Possible next steps
+Revit parameters have a fixed storage type, but the window only gives text. This function converts the typed text before writing it:
 
-Preserve in-note formatting with Revit's formatted-text API, rule packs for other standards and languages, feed the Excel log into a QA dashboard, and package the nodes as a Dynamo package.
+| Storage type | Accepted text |
+|---|---|
+| String | anything, written as typed |
+| Integer | `true` / `yes` / `1` (sets 1), `false` / `no` / `0` (sets 0), or a whole number |
+| Double | a number, converted with `float()` |
+| ElementId | an integer element ID |
 
-## License
+It returns whether `param.Set(...)` succeeded.
 
-MIT. See [LICENSE](LICENSE).
+## 3️⃣ Part 3: Check and unwrap the input
+
+```python
+wrapped_sheets = raw_input if isinstance(raw_input, list) else [raw_input]
+wrapped_sheets = [s for s in wrapped_sheets if s is not None]
+...
+for s in wrapped_sheets:
+    if hasattr(s, "InternalElement"):
+        db_sheets.append(s.InternalElement)
+    else:
+        db_sheets.append(s)
+```
+
+The script makes sure it always has a list, drops nulls, and stops with a message if the input is `None` or has no valid sheets. Dynamo wraps Revit elements in its own objects, so `InternalElement` is used to get the underlying Revit sheet that has `SheetNumber` and `LookupParameter`.
+
+## 4️⃣ Part 4: The input window
+
+```python
+def add_parameter_row(default_name="", default_val=""):
+    grid = Grid()
+    ...
+    tb_name = TextBox()
+    tb_val = TextBox()
+    btn_del = Button()          # red "✕" removes this row
+    ...
+    param_row_controls.append((tb_name, tb_val))
+
+add_parameter_row("Drawn By", "")
+```
+
+The window is built entirely in code (no XAML). Each row is a grid with a parameter-name box, a value box and a delete button. `param_row_controls` remembers every row's two text boxes so their contents can be read later. **+ Add Parameter** adds another row, and the first row starts as `Drawn By`.
+
+```python
+if win.ShowDialog() == True:
+    param_updates = []
+    for tb_name, tb_val in param_row_controls:
+        p_name = tb_name.Text.strip()
+        if p_name:
+            param_updates.append((p_name, tb_val.Text))
+```
+
+`ShowDialog()` pauses Dynamo until the window closes. Clicking **Apply** sets `DialogResult = True`; closing the window any other way ends with `Operation cancelled by user.` Rows with a blank name are skipped.
+
+## 5️⃣ Part 5: Writing to Revit
+
+```python
+TransactionManager.Instance.EnsureInTransaction(doc)
+try:
+    for sheet in db_sheets:
+        for p_name, p_val in param_updates:
+            param = sheet.LookupParameter(p_name)
+            if param is None:
+                error_logs.append((p_name, f"Parameter '{p_name}' does not exist on sheet {label}."))
+            elif param.IsReadOnly:
+                error_logs.append((p_name, f"Parameter '{p_name}' is read-only on sheet {label}."))
+            else:
+                success = set_param_value(param, p_val)
+                ...
+finally:
+    # Always close the transaction, even if something unexpected fails inside the loop
+    TransactionManager.Instance.TransactionTaskDone()
+
+doc.Regenerate()
+```
+
+Revit only allows edits inside a transaction. The loop sits inside a `try` block, and `TransactionTaskDone()` is in the matching `finally` block, so the transaction is **always closed**, whether the loop finishes normally or fails. For every sheet and every parameter row the script looks the parameter up, logs an error if it is missing or read-only, and otherwise writes the converted value.
+
+Two kinds of problems are handled differently:
+
+- **Expected problems** (missing or read-only parameter, a value that cannot be converted) are caught one by one and added to the error log, so the other sheets and parameters still run.
+- **Unexpected failures** inside the loop close the transaction through `finally`, then fall through to the global `try/except`. `OUT` becomes `Global Script Error: ...`, and `doc.Regenerate()` and the report window are skipped.
+
+Three collections record the outcome:
+
+- `error_logs`: pairs of parameter name and message
+- `successful_sheets`: a set of labels such as `A101 - Floor Plan`
+- `successful_params`: a set of parameter names that were written
+
+## 6️⃣ Part 6: Report window and output
+
+```python
+parts = err.split(f"'{p_name}'")
+...
+p_run = Run(p_name)
+p_run.TextDecorations = TextDecorations.Underline
+```
+
+A second window opens. The **error section** (red, shown only if there are errors) underlines the parameter name inside each message and ends with a total. The **success section** builds a sentence such as *"Successful replacement of Parameters A, B, and C for sheets:"* with the names underlined, then lists each sheet with a total. A **Close** button ends the window.
+
+```python
+OUT = {
+    "TotalErrors": len(error_logs),
+    "TotalUpdatedSheets": len(successful_sheets),
+    "Errors": [e[1] for e in error_logs],
+    "UpdatedSheets": sorted(list(successful_sheets)),
+    "UpdatedParameters": sorted(list(successful_params))
+}
+```
+
+The dictionary goes back to Dynamo for a Watch node. Other possible outputs are plain text messages: `Error: ...`, `Operation cancelled by user.` and `Global Script Error: ...`.
+
+
+## License 
+MIT. See [LICENSE](../LICENSE)
