@@ -21,7 +21,8 @@ Sheets are grouped through a filter grouping parameter value. Dynamo Player asks
 ## 🔧How It Works
 
 1. User inputs the sheet filter grouping parameter name and value, the dictionary file location and the dictionary sheet name  
-![Dynamo Player](images/ReplaceTextNotes_Flow1.png)
+![Dynamo Player](images/ReplaceTextNotesBasedOnExcelDictionary_Dynamo.png)
+
 2. Dynamo filters sheets based on the input parameter name and value
 
 3. Dynamo collects every text note whose owner is one of the filtered sheets or a view placed on one of them
@@ -29,12 +30,12 @@ Sheets are grouped through a filter grouping parameter value. Dynamo Player asks
 4. Dynamo imports the Excel dictionary and splits it into a list of find words and a list of replacement words
 
 5. Python script runs every dictionary entry against each text note and keeps whole-word matches only
-![Dictionary](images/ReplaceTextNotes_Flow2.png)
+![Dictionary](images/ReplaceTextNotesBasedOnExcelDictionary_ExcelDictionary.png)
 
 6. Python script writes the changed text back to each text note that was modified
 
 7. Dynamo compares the original and new text, and generates an output listing only the notes that changed, each with its sheet number
-![Output Report](images/ReplaceTextNotes_Flow3.png)
+![Output Report](images/ReplaceTextNotesBasedOnExcelDictionary_Flow2.png)
 
 Demo
 ![Script Demo](images/ReplaceTextNotes_Demo.gif)
