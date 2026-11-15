@@ -21,7 +21,7 @@ Sheets are grouped through a filter grouping parameter value. Dynamo Player asks
 ## 🔧How It Works
 
 1. User inputs the sheet filter grouping parameter name and value, the dictionary file location and the dictionary sheet name  
-![Dynamo Player](images/ReplaceTextNotesBasedOnExcelDictionary_Dynamo.png)
+![Dynamo Player](images/ReplaceTextNotesBasedOnExcelDictionary_DynamoPlayer.png)
 
 2. Dynamo filters sheets based on the input parameter name and value
 
@@ -35,15 +35,15 @@ Sheets are grouped through a filter grouping parameter value. Dynamo Player asks
 6. Python script writes the changed text back to each text note that was modified
 
 7. Dynamo compares the original and new text, and generates an output listing only the notes that changed, each with its sheet number
-![Output Report](images/ReplaceTextNotesBasedOnExcelDictionary_Flow2.png)
+![Output Report](images/ReplaceTextNotesBasedOnExcelDictionary_Output.png)
 
 Demo
-![Script Demo](images/ReplaceTextNotes_Demo.gif)
+![Script Demo](images/ReplaceTextNotesBasedOnExcelDictionary_Demo.gif)
 
 ## 📊Dynamo Graph
 
 ![Dynamo Graph for ReplaceTextNotesBasedOnExcelDictionary](images/ReplaceTextNotesBasedOnExcelDictionary_Dynamo.png)
-[View ReplaceTextNotesBasedOnExcelDictionary dynamo script](dynamo/ReplaceTextNotesBasedOnExcelDictionary.dyn)  
+[View Dynamo script](dynamo/ReplaceTextNotesBasedOnExcelDictionary.dyn)  
 
 **Player inputs**
 
