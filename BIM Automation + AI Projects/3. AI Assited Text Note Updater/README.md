@@ -59,13 +59,13 @@ This graph is the next step after the **ReplaceTextNotesBasedOnExcelDictionary**
 8. Node 3 writes the changed notes to the Excel report (sheet number, Element ID, original text, new text, date of update)
 ![Excel Report](images/AIAssistedTextNoteUpdater_ExcelReportOutput.png)
 
-Demo
+<b>Demo</b>
 ![Script Demo](images/AIAssistedTextNoteUpdater_Demo.gif)
 
 ## 📊Dynamo Graph
 
-![Dynamo Graph for TextNoteLanguageMarkup](images/AIAssistedTextNoteUpdater_DynamoScript.png)
-[View TextNoteLanguageMarkup dynamo script](dynamo/AIAssistedTextNoteUpdater.dyn)
+![Dynamo Graph](images/AIAssistedTextNoteUpdater_DynamoScript.png)
+[View Dynamo script](dynamo/AIAssistedTextNoteUpdater.dyn)
 
 Dynamo script walkthrough 
 
