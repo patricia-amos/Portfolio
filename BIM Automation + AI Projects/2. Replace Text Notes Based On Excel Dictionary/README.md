@@ -29,7 +29,7 @@ Sheets are grouped through a filter grouping parameter value. Dynamo Player asks
 
 4. Dynamo imports the Excel dictionary and splits it into a list of find words and a list of replacement words
 
-5. Python script runs every dictionary entry against each text note and keeps whole-word matches only
+5. Python script runs every dictionary entry against each text note and keeps whole-word matches only </br>
 ![Dictionary](images/ReplaceTextNotesBasedOnExcelDictionary_ExcelDictionary.png)
 
 6. Python script writes the changed text back to each text note that was modified
@@ -37,7 +37,7 @@ Sheets are grouped through a filter grouping parameter value. Dynamo Player asks
 7. Dynamo compares the original and new text, and generates an output listing only the notes that changed, each with its sheet number
 ![Output Report](images/ReplaceTextNotesBasedOnExcelDictionary_Output.png)
 
-Demo
+<b>Demo</b>
 ![Script Demo](images/ReplaceTextNotesBasedOnExcelDictionary_Demo.gif)
 
 ## 📊Dynamo Graph
