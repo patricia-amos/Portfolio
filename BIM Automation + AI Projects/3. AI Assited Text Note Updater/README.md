@@ -40,7 +40,7 @@ This graph is the next step after the **ReplaceTextNotesBasedOnExcelDictionary**
 ## 🔧How It Works
 
 1. User inputs sheet filter grouping parameter name and value  
-![Dynamo Player](images/TextNoteLanguageMarkup_Flow1.png)
+![Dynamo Player](images/Dynamo%20Player%20Interface.png)
 
 2. Dynamo filters sheets based on input parameter name and value 
 
@@ -50,22 +50,22 @@ This graph is the next step after the **ReplaceTextNotesBasedOnExcelDictionary**
 
 5. Node 2 opens the review page in the browser
 
-![Review UI](images/TextNoteLanguageMarkup_Flow2.png)
+![Review UI](images/Text%20note%20review%20UI.png
 
 6. User approves, rejects or edits each proposed note, then clicks **Save & finish**
 
 7. Node 3 replaces the text of every approved note (or deletes it if all words were removed)
 
 8. Node 3 writes the changed notes to the Excel report (sheet number, Element ID, original text, new text, date of update)
-![Excel Report](images/TextNoteLanguageMarkup_Flow3.png)
+![Excel Report](images/Excel%20Report%20Output.png)
 
 Demo
 ![Script Demo](images/TextNoteLanguageMarkup_Demo.gif)
 
 ## 📊Dynamo Graph
 
-![Dynamo Graph for TextNoteLanguageMarkup](images/TextNoteLanguageMarkup_Dynamo%20Script.png)
-[View TextNoteLanguageMarkup dynamo script](dynamo/TextNoteLanguageMarkup.dyn)  
+![Dynamo Graph for TextNoteLanguageMarkup](images/Dynamo%20Script.png)
+[View TextNoteLanguageMarkup dynamo script](dynamo/AIAssistedTextNoteUpdate.dyn)
 
 Dynamo script walkthrough 
 
