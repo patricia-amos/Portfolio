@@ -1,4 +1,4 @@
-# Text Note Language Markup with Ollama
+# AI Assisted Text Note Updater with Ollama
 
 Revit text note language markup through Dynamo and a local AI model (Ollama). For rewriting the wording of text notes on selected sheets and their views according to a set of editable rules, with a human review step before anything touches the model.
 
@@ -40,7 +40,7 @@ This graph is the next step after the **ReplaceTextNotesBasedOnExcelDictionary**
 ## 🔧How It Works
 
 1. User inputs sheet filter grouping parameter name and value  
-![Dynamo Player](images/Dynamo%20Player%20Interface.png)
+![Dynamo Player](images/AIAssistedTextNoteUpdater_DynamoPlayer.png)
 
 2. Dynamo filters sheets based on input parameter name and value 
 
@@ -50,22 +50,22 @@ This graph is the next step after the **ReplaceTextNotesBasedOnExcelDictionary**
 
 5. Node 2 opens the review page in the browser
 
-![Review UI](images/Text%20note%20review%20UI.png
+![Review UI](images/AIAssistedTextNoteUpdater_TextNoteReviewUI.png)
 
 6. User approves, rejects or edits each proposed note, then clicks **Save & finish**
 
 7. Node 3 replaces the text of every approved note (or deletes it if all words were removed)
 
 8. Node 3 writes the changed notes to the Excel report (sheet number, Element ID, original text, new text, date of update)
-![Excel Report](images/Excel%20Report%20Output.png)
+![Excel Report](images/AIAssistedTextNoteUpdater_ExcelReportOutput.png)
 
 Demo
-![Script Demo](images/TextNoteLanguageMarkup_Demo.gif)
+![Script Demo](images/AIAssistedTextNoteUpdater_Demo.gif)
 
 ## 📊Dynamo Graph
 
-![Dynamo Graph for TextNoteLanguageMarkup](images/Dynamo%20Script.png)
-[View TextNoteLanguageMarkup dynamo script](dynamo/AIAssistedTextNoteUpdate.dyn)
+![Dynamo Graph for TextNoteLanguageMarkup](images/AIAssistedTextNoteUpdater_DynamoScript.png)
+[View TextNoteLanguageMarkup dynamo script](dynamo/AIAssistedTextNoteUpdater.dyn)
 
 Dynamo script walkthrough 
 
