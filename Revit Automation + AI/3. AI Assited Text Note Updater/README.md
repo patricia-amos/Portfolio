@@ -18,7 +18,7 @@ Writing back has a **dry run** mode (default) that logs what would happen withou
 
 ### 🔄 Improvement on ReplaceTextNotesBasedOnExcelDictionary
 
-This graph is the next step after the **ReplaceTextNotesBasedOnExcelDictionary** graph (Dynamo 3.3.0, Clockwork package). That graph filters sheets by a grouping parameter, then replaces text in the notes on those sheets and their views using `Dictionary.xlsx`, a two-column file of words to find and the words to replace them with. The sheet filtering and the text note collection carry over, and the replacement step changes from a dictionary to a local AI model with rules.
+This graph is the next step after the **ReplaceTextNotesBasedOnExcelDictionary** graph. That graph filters sheets by a grouping parameter, then replaces text in the notes on those sheets and their views using `Dictionary.xlsx`, a two-column file of words to find and the words to replace them with. The sheet filtering and the text note collection carry over, and the replacement step changes from a dictionary to a local AI model with rules.
 
 | | Dictionary graph | This graph |
 |---|---|---|
