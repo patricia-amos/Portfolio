@@ -8,7 +8,7 @@ Revit sheets contain multiple parameters whose values frequently change througho
 
 ## 💻What It Does
 
-Sheets are grouped through a filter grouping parameter value. Dynamo player would require a filter parameter name and value input to specify sheets for application. Upon running the script, dynamo prompts an input window wherein the users can add one or more parameter names and values. These values will be applied and reflected on the and output window. Output will show 2 sections, an errors or missing parameters section and a successful parameter replacement section. 
+Sheets are grouped through a filter grouping parameter value. Dynamo player would require a filter parameter name and value input to specify sheets for application. Upon running the script, dynamo prompts an input window wherein the users can add one or more parameter names and values. These values will be applied and reflected on the output window. Output will show 2 sections, an errors or missing parameters section and a successful parameter replacement section. 
 
 ## 🛠️Tools 
 
