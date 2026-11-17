@@ -1,6 +1,6 @@
 # AI Assisted Text Note Updater with Ollama
 
-Revit text note language markup through Dynamo and a local AI model (Ollama). For rewriting the wording of text notes on selected sheets and their views according to a set of editable rules, with a human review step before anything touches the model.
+Revit text note language markup through Dynamo and a local AI model (Ollama). For rewriting the wording of text notes on selected sheets and their views according to a set of editable rules with a human review step before anything touches the model.
 
 ## 🏢The Problem
 
