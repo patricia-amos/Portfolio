@@ -92,13 +92,6 @@ The same graph covers many situations in a drawing set. Only the dictionary and 
 | Update status wording for a new issue | `FOR REVIEW` → `FOR CONSTRUCTION` | `Drawing Status` |
 | Apply a project or company rename | `Old Project Name` → `New Project Name` | `Project Names` |
 
-Practical ways to use it:
-
-- **Clean up an imported or merged set.** Run the standardizing dictionaries on sheets that came from other templates, offices or consultants.
-- **Prepare for an issue.** Run `Typos` and `Drawing Status` on only the sheet group being issued by using the sheet grouping parameter.
-- **Target one discipline or phase.** Group sheets with a parameter such as `Filter Grouping`, then run a dictionary on that group only.
-- **Run one theme at a time.** Type a sheet name such as `Fire Rating` in the Dictionary Sheet Name input to apply only that sheet's entries. `Sheet1` in the sample combines the general-purpose sheets (everything except `Code References`, `Drawing Status` and `Project Names`, which are project-specific).
-
 Guidance for building your own dictionary:
 
 - List multi-word phrases above the single words they contain (`gyp bd` before `bd`).
