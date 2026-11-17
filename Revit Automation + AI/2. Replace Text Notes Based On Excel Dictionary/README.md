@@ -64,7 +64,7 @@ Dynamo script walkthrough, following the five groups in the graph
 
 ### 📘 Dictionary format
 
-The dictionary is read from the worksheet named in the input. Row 1 is a header row and is not used as an entry. Each row after it is one find and replace pair, in two columns:
+The dictionary is read from the worksheet named in the input. Row 1 is a header row and is not used as an entry. Each row after that is one find and replace pair, in two columns:
 
 | Column A | Column B |
 |---|---|
