@@ -67,14 +67,14 @@ This graph is the next step after the **ReplaceTextNotesBasedOnExcelDictionary**
 ![Dynamo Graph](images/AIAssistedTextNoteUpdater_DynamoScript.png)
 [View Dynamo script](dynamo/AIAssistedTextNoteUpdater.dyn)
 
-Dynamo script walkthrough 
+**Dynamo script walkthrough**
 
-**Filtering sheets based on a sheet grouping parameter value**
+Filtering sheets based on a sheet grouping parameter value
 
 1. Selects all sheet elements through Categories and All Elements of Category nodes
 2. Filters sheets through a filter parameter name and value with Element.GetParameterValueByName, ==, and List.FilterByBoolMask 
 
-**Getting all text notes inside sheets and views**
+Getting all text notes inside sheets and views
 
 3. Selects all text notes in the model through Categories and All Elements of Category nodes
 4. Gets the views placed on the filtered sheets with Sheet.Views, and joins them with the sheets in one flattened list (List.Create, List.Flatten)
@@ -83,13 +83,13 @@ Dynamo script walkthrough
 7. Reads the note text with TextNote.Text and a Code Block mask removes the notes that should not be sent
 8. A second List.FilterByBoolMask applies that mask to the text notes
 
-**Connecting Text Notes to Ollama AI**
+Connecting Text Notes to Ollama AI
 
 9. For each remaining text note, the graph collects the five lists Node 1 needs: Element.UniqueId, Element.Id, sheet number (Element.OwnerView, then Element.GetParameterValueByName with `Sheet Number`) and TextNote.Text
 10. A folder path String (**AI Files**) points to the scripts folder, and a second String (**Report Output File Location**) sets where the Excel report is saved
 11. The lists and paths feed **Node 1** (Python Script). Its output feeds **Review UI** (Node 2)
 
-**Output Report**
+Output Report
 
 12. The output of Node 2 and a Boolean (dry run switch) feed **Node 3** (Python Script), which writes to Revit and creates the Excel report
 
