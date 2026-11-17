@@ -20,7 +20,7 @@ Sheets are grouped through a filter grouping parameter value. Dynamo Player asks
 
 ## 🔧How It Works
 
-1. User inputs the sheet filter grouping parameter name and value, the dictionary file location and the dictionary sheet name  
+1. User inputs the sheet filter grouping parameter name and value, the dictionary file location, and sheet name  
 ![Dynamo Player](images/ReplaceTextNotesBasedOnExcelDictionary_DynamoPlayer.png)
 
 2. Dynamo filters sheets based on the input parameter name and value
