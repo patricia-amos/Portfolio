@@ -20,7 +20,7 @@ Sheets are grouped through a filter grouping parameter value. Dynamo Player asks
 
 ## 🔧How It Works
 
-1. User inputs the sheet filter grouping parameter name and value, the dictionary file location and the dictionary sheet name  
+1. User inputs the sheet filter grouping parameter name and value, the dictionary file location, and sheet name  
 ![Dynamo Player](images/ReplaceTextNotesBasedOnExcelDictionary_DynamoPlayer.png)
 
 2. Dynamo filters sheets based on the input parameter name and value
@@ -64,7 +64,7 @@ Dynamo script walkthrough, following the five groups in the graph
 
 ### 📘 Dictionary format
 
-The dictionary is read from the worksheet named in the input. Row 1 is a header row and is not used as an entry. Each row after it is one find and replace pair, in two columns:
+The dictionary is read from the worksheet named in the input. Row 1 is a header row and is not used as an entry. Each row after that is one find and replace pair, in two columns:
 
 | Column A | Column B |
 |---|---|
@@ -91,13 +91,6 @@ The same graph covers many situations in a drawing set. Only the dictionary and 
 | Update a code or standard edition | `IBC 2018` → `IBC 2021` | `Code References` |
 | Update status wording for a new issue | `FOR REVIEW` → `FOR CONSTRUCTION` | `Drawing Status` |
 | Apply a project or company rename | `Old Project Name` → `New Project Name` | `Project Names` |
-
-Practical ways to use it:
-
-- **Clean up an imported or merged set.** Run the standardizing dictionaries on sheets that came from other templates, offices or consultants.
-- **Prepare for an issue.** Run `Typos` and `Drawing Status` on only the sheet group being issued by using the sheet grouping parameter.
-- **Target one discipline or phase.** Group sheets with a parameter such as `Filter Grouping`, then run a dictionary on that group only.
-- **Run one theme at a time.** Type a sheet name such as `Fire Rating` in the Dictionary Sheet Name input to apply only that sheet's entries. `Sheet1` in the sample combines the general-purpose sheets (everything except `Code References`, `Drawing Status` and `Project Names`, which are project-specific).
 
 Guidance for building your own dictionary:
 
